@@ -32,10 +32,11 @@ Example:
 tesseract noisy_example.png noisy_output
 ```
 ![example_01](https://user-images.githubusercontent.com/34404522/69370594-88efbb80-0c9e-11ea-8d40-5261d3cf92f0.png)
+
 And our output (noisy_output.txt) reads: 
 >Noisyimage 
 >to test
-Tesseract OCR
+>Tesseract OCR
 
 
 
@@ -49,8 +50,7 @@ tesseract imagename outputbase -l pol
 ```
 Which with our previous example produced almost the same results: 
 >Noisy image
-to test
-Tesseract OCR
+>to test
+>Tesseract OCR
 
 More on arguments for tesseract command line usage can be found in the [official documentation.](https://github.com/tesseract-ocr/tesseract/wiki/Command-Line-Usage)
-W
