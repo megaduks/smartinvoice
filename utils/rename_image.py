@@ -9,6 +9,10 @@ def main(file_name: str) -> str:
     :param file_name: input file name
     :return: new file name generated from file content hash
     """
+
+    if not os.path.exists(file_name):
+        raise FileNotFoundError
+
     fname, extension = file_name.split('.')
     hash_file_name = f'{imagehash.average_hash(Image.open(file_name))}.{extension}'
     os.rename(file_name, hash_file_name)
