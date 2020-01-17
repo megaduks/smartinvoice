@@ -3,6 +3,8 @@
     "$id": "/github.com/megaduks/smartinvoice/invoice.schema.json",
     "title": "Schemat JSON danych pojawiających się na fakturach",
     "description": "Schemat opisujący typy atrybutów jakie mogą się pojawić na różnego rodzaju fakturach wystawianych w Polsce. Schemat został stworzony na potrzeby procesu automatycznego rozpoznawania i anotowania cyfrowych faktur.",
+    "version_number": "0.2",
+    "versoin_date": "2020-01-17",
     "type": "object",
     "properties": {
         "numer_faktury": {
