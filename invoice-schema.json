@@ -12,7 +12,7 @@
         "typ_faktury": {
             "description": "Typ faktury, np. faktura sprzedażowa, faktura pro-forma, zaliczka",
             "type": "string",
-            "enum": ["faktura","pro-forma","zaliczka","rozliczenie-zaliczki","faktura-rr"] 
+            "enum": ["faktura_vat","pro_forma","zaliczka","rozliczenie_zaliczki","faktura_rr"]
         },
         "data_sprzedazy": {
             "description": "Data faktycznej sprzedaży towaru lub usługi",
@@ -38,29 +38,60 @@
             "description": "Nazwa przedsiębiorstwa nabywcy lub imię i nazwisko osoby fizycznej",
             "type": "string"
         },
-        "kwota_netto": {
+        "towary": {
+            "description": "Lista towarów lub usług wymienionych na fakturze",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "lp": { "type": "integer" },
+                    "nazwa": { "type": "string" },
+                    "miara": { "type": "string" },
+                    "ilosc": { "type": "string" },
+                    "cena_jednostkowa": { "type": "number" },
+                    "wartosc_netto": { "type": "number" },
+                    "stawka_podatku": { "type": "number", "enum": [0, 5, 8, 23] },
+                    "kwota_podatku": { "type": "number" },
+                    "wartosc_brutto": { "type": "number" }
+                    }
+                }
+        },
+        "razem_kwota_netto": {
             "description": "Sumaryczna należność netto za całą fakturę",
             "type": "number"
         },
-        "kwota_brutto": {
+        "razem_kwota_brutto": {
             "description": "Sumaryczna należność brutto za całą fakturę",
             "type": "number"
         },
-        "kwota_netto_23": {
-            "description": "Sumaryczna należność netto pozycji na fakturze objętych podatkiem 23%",
+        "razem_kwota_podatku_vat": {
+            "description": "Sumaryczna wartość naliczonego podatku VAT",
             "type": "number"
         },
-        "kwota_netto_8": {
-            "description": "Sumaryczna należność netto pozycji na fakturze objętych podatkiem 8%",
+        "przedplata_kwota_netto": {
+            "description": "Sumaryczna przedpłata netto za całą fakturę",
             "type": "number"
         },
-        "kwota_netto_5": {
-            "description": "Sumaryczna należność netto pozycji na fakturze objętych podatkiem 5%",
+        "przedplata_kwota_brutto": {
+            "description": "Sumaryczna przedpłata brutto za całą fakturę",
             "type": "number"
         },
-        "kwota_netto_0": {
-            "description": "Sumaryczna należność netto pozycji na fakturze objętych podatkiem 0%",
+        "przedplata_kwota_podatku_vat": {
+            "description": "Sumaryczna przedpłata naliczonego podatku VAT",
             "type": "number"
+        },
+        "rozliczenie_vat": {
+            "description": "Rozbicie kwot netto i brutto na poszczególne stawki podatkowe",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "stawka_podatku": { "type": "number", "enum": [0, 5, 8, 23] },
+                    "wartosc_netto": { "type": "number" },
+                    "podatek": { "type": "number" },
+                    "wartosc_brutto": { "type": "number" }
+                }
+            }
         },
         "czy_usluga": {
             "description": "Czy faktura dotyczy wykonanej usługi?",
@@ -68,7 +99,8 @@
         },
         "forma_platnosci": {
             "description": "Jaka forma płatności jest przewidziana?",
-            "type": "string"
+            "type": "string",
+            "enum": ["przelew", "gotówka", "karta"]
         },
         "termin_platnosci": {
             "description": "Termin płatności w przypadku przelewu",
@@ -77,7 +109,15 @@
         "numer_konta_sprzedawcy": {
             "description": "Numer konta do płatności w przypadku przelewu",
             "type": "string"
+        },
+        "do_zaplaty": {
+            "description": "Sumaryczna kwota jaka pozostała do zapłaty",
+            "type": "number"
+        },
+        "zaplacono": {
+            "description": "Kwota która została zapłacona jako zaliczka",
+            "type": "number"
         }
     },
-    "required": [ "numer_faktury", "nip_sprzedawcy", "typ_faktury", "kwota_brutto" ]
+    "required": [ "numer_faktury", "nip_sprzedawcy", "typ_faktury", "kwota_brutto", "stawka_vat" ]
 }
