@@ -1,0 +1,44 @@
+{
+  "numer_faktury": "37",
+  "typ_faktury": "faktura_vat",
+  "data_sprzedazy": "2019-06-27",
+  "data_wystawienia": "2019-06-27",
+  "nip_sprzedawcy": "8990007374",
+  "nazwa_sprzedawcy": "P.P.H.U TADEX",
+  "nip_nabywcy": "7772144056",
+  "nazwa_nabywcy": "PHU Szwarc Wojciech Szwarc",
+  "towary": [
+    {
+      "lp": "1",
+      "nazwa": "Usługa gastronomiczna",
+      "miara": "",
+      "ilosc": "",
+      "cena_jednostkowa": "",
+      "wartosc_netto": "6000,00",
+      "stawka_podatku": "8",
+      "kwota_podatku": "480,00",
+      "wartosc_brutto": "6480,00"
+    }
+
+  ],
+  "razem_kwota_netto": "6000,00",
+  "razem_kwota_podatku_vat": "480,00",
+  "razem_kwota_brutto": "6480,00",
+  "przedplata_kwota_netto": "",
+  "przedplata_kwota_podatku_vat": "",
+  "przedplata_kwota_brutto": "",
+  "rozliczenie_vat": [
+    {
+      "stawka_podatku": "8",
+      "wartosc_netto": "6000,00",
+      "podatek": "480,00",
+      "wartosc_brutto": "6480,00"
+    }
+  ],
+  "czy_usluga": "",
+  "forma_platnosci": "gotówka",
+  "termin_platnosci": "",
+  "numer_konta_sprzedawcy": "",
+  "do_zaplaty": "",
+  "zaplacono": "31 500,00"
+}
