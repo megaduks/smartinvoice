@@ -1,4 +1,5 @@
 {
+  "schema_version": "0.2",
   "numer_faktury": "703/19/FP",
   "typ_faktury": "faktura_vat",
   "data_sprzedazy": "2019-09-02",
@@ -40,5 +41,8 @@
   "termin_platnosci": "",
   "numer_konta_sprzedawcy": "",
   "do_zaplaty": "6480,00",
-  "zaplacono": ""
+  "zaplacono": "",
+  "zaplacono_w_dniu": "2019-09-02",
+  "razem_do_zwrotu": "",
+  "faktura_zaliczkowa": ""
 }

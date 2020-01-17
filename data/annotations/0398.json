@@ -1,4 +1,5 @@
 {
+  "schema_version": "0.2",
   "numer_faktury": "FA/3/07/2019",
   "typ_faktury": "faktura_vat",
   "data_sprzedazy": "2019-07-25",
@@ -40,5 +41,12 @@
   "termin_platnosci": "",
   "numer_konta_sprzedawcy": "",
   "do_zaplaty": "",
-  "zaplacono": "31 500,00"
+  "zaplacono": "31 500,00",
+  "zaplacono_w_dniu": "",
+  "razem_do_zwrotu": "",
+  "faktura_zaliczkowa": {
+    "data": "2019-06-13",
+    "numer": "FA/1/06/2019",
+    "wartosc": "31500,00"
+  }
 }
