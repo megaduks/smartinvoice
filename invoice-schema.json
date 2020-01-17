@@ -119,6 +119,23 @@
         "zaplacono": {
             "description": "Kwota która została zapłacona jako zaliczka",
             "type": "number"
+        },
+        "zaplacono_w_dniu": {
+            "description": "Data, kiedy nastąpiła płatność faktury",
+            "type": "string"
+        },
+        "razem_do_zwrotu": {
+            "description": "Kwota wynikająca z różnicy między zaliczką/przedpłatą a kwotą na fakturze",
+            "type": "number"
+        },
+        "faktura_zaliczkowa": {
+            "description": "Informacje o fakturze zaliczkowej z którą jest związana dana faktura VAT",
+            "type": "object",
+            "properties": {
+                "data": { "type": "string" },
+                "numer": { "type": "number" },
+                "wartosc": { "type": "number" }
+            }
         }
     },
     "required": [ "numer_faktury", "nip_sprzedawcy", "typ_faktury", "kwota_brutto", "stawka_vat" ]
