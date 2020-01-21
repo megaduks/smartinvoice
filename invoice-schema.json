@@ -1,0 +1,83 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "/github.com/megaduks/smartinvoice/invoice.schema.json",
+    "title": "Schemat JSON danych pojawiających się na fakturach",
+    "description": "Schemat opisujący typy atrybutów jakie mogą się pojawić na różnego rodzaju fakturach wystawianych w Polsce. Schemat został stworzony na potrzeby procesu automatycznego rozpoznawania i anotowania cyfrowych faktur.",
+    "type": "object",
+    "properties": {
+        "numer_faktury": {
+            "description": "Unikalny numer faktury w ramach faktur wystawionych przez danego sprzedawcę",
+            "type": "string"
+        },
+        "typ_faktury": {
+            "description": "Typ faktury, np. faktura sprzedażowa, faktura pro-forma, zaliczka",
+            "type": "string",
+            "enum": ["faktura","pro-forma","zaliczka","rozliczenie-zaliczki","faktura-rr"] 
+        },
+        "data_sprzedazy": {
+            "description": "Data faktycznej sprzedaży towaru lub usługi",
+            "type": "string"
+        },
+        "data_wystawienia": {
+            "description": "Data wystawienia faktury za sprzedaż towaru lub usługi",
+            "type": "string"
+        },
+        "nip_sprzedawcy": {
+            "description": "Numer identyfikacji podatkowej sprzedawcy",
+            "type": "string"
+        },
+        "nazwa_sprzedawcy": {
+            "description": "Nazwa przedsiębiorstwa sprzedawcy",
+            "type": "string"
+        },
+        "nip_nabywcy": {
+            "description": "Numer identyfikacji podatkowej nabywcy",
+            "type": "string"
+        },
+        "nazwa_nabywcy": {
+            "description": "Nazwa przedsiębiorstwa nabywcy lub imię i nazwisko osoby fizycznej",
+            "type": "string"
+        },
+        "kwota_netto": {
+            "description": "Sumaryczna należność netto za całą fakturę",
+            "type": "number"
+        },
+        "kwota_brutto": {
+            "description": "Sumaryczna należność brutto za całą fakturę",
+            "type": "number"
+        },
+        "kwota_netto_23": {
+            "description": "Sumaryczna należność netto pozycji na fakturze objętych podatkiem 23%",
+            "type": "number"
+        },
+        "kwota_netto_8": {
+            "description": "Sumaryczna należność netto pozycji na fakturze objętych podatkiem 8%",
+            "type": "number"
+        },
+        "kwota_netto_5": {
+            "description": "Sumaryczna należność netto pozycji na fakturze objętych podatkiem 5%",
+            "type": "number"
+        },
+        "kwota_netto_0": {
+            "description": "Sumaryczna należność netto pozycji na fakturze objętych podatkiem 0%",
+            "type": "number"
+        },
+        "czy_usluga": {
+            "description": "Czy faktura dotyczy wykonanej usługi?",
+            "type": "boolean"
+        },
+        "forma_platnosci": {
+            "description": "Jaka forma płatności jest przewidziana?",
+            "type": "string"
+        },
+        "termin_platnosci": {
+            "description": "Termin płatności w przypadku przelewu",
+            "type": "string"
+        },
+        "numer_konta_sprzedawcy": {
+            "description": "Numer konta do płatności w przypadku przelewu",
+            "type": "string"
+        }
+    },
+    "required": [ "numer_faktury", "nip_sprzedawcy", "typ_faktury", "kwota_brutto" ]
+}
