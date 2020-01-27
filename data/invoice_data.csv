@@ -10,4 +10,7 @@ filename ,typ_faktury,numer_faktury,numer_konta,kwota_brutto ,stawka_VAT,sprzeda
 00ffffffff000000.png,fv,10107067/P203/2018,,145,23,5862016763,JYSK Sp. z o. o.
 00fffffffffc0000.png,fv,36368/SYS/2018,43 1160 2244 7406 0000 0000 6008,71.3,23,7773030567,Systemia.pl Sp. Z o. o.
 00fffffffffcf800.png,fv,FV/UP/915/18/POZ,75 1020 4027 0000 1802 0035 7103,997.91,23,7772624218,Autoryzowany Dealer Nissan A. I R. Polody Spółka Jawna
-00fffffffffe8000.png,,,,,,,
+00fffffffffe8000.png,wdz,80404730,51 1240 2092 9635 0000 0412 8362,1029.26,23,8970012657,Europejski Fundusz Leasingowy S. A.
+00fffffffffef000.png,fv,23/2018,,100,23,7771161963,ŻUCZEK Urszula Kozielec
+00fffffffffef800.png,fv,FF/196663/2019,,70.8,23,9721012067,PRZEDSIEBIORSTWO HANDLOWO USŁUGOWE NATALIA KACZMAREK
+00fffffffffefc00.png,wdz,3965/2019/08/TCFK,83 1750 1312 6020 0000 3001 8846,173.77,23,7791002618,IINEA S. A.
