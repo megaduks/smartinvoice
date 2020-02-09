@@ -10,6 +10,11 @@ import argparse
 import cv2
 import os
 from tqdm import tqdm
+def sort_boxes(boxes):
+    #TODO: sort boxes so they represent the position of them on page
+
+    pass
+
 
 def decode_predictions(scores, geometry):
     # grab the number of rows and columns from the scores volume, then
@@ -68,7 +73,6 @@ def decode_predictions(scores, geometry):
     # return a tuple of the bounding boxes and associated confidences
     return (rects, confidences)
 
-
 def clean_output(text):
     # Remove non-ASCII characters from the input string
     text = "".join([c if ord(c) < 128 else "" for c in text]).strip()
@@ -83,10 +87,10 @@ ap.add_argument("-east", "--east", type=str,
                 help="path to input EAST text detector")
 ap.add_argument("-c", "--min-confidence", type=float, default=0.5,
                 help="minimum probability required to inspect a region")
-ap.add_argument("-w", "--width", type=int, default=1056,
-                help="nearest multiple of 32 for resized width")
+'''ap.add_argument("-w", "--width", type=int, default=1056,
+               help="nearest multiple of 32 for resized width")
 ap.add_argument("-e", "--height", type=int, default=1920,
-                help="nearest multiple of 32 for resized height")
+                help="nearest multiple of 32 for resized height")'''
 ap.add_argument("-p", "--padding", type=float, default=0.1,
                 help="amount of padding to add to each border of ROI")
 ap.add_argument("-d", "--display", type=bool, default=False,
@@ -113,8 +117,15 @@ for pathToImg in tqdm(args['image']):
 
     # set the new width and height and then determine the ratio in change
     # for both the width and height
-    (newW, newH) = (args["width"], args["height"])
+    #(newW, newH) = (args["width"], args["height"])
+    #rW = origW / float(newW)
+    #rH = origH / float(newH)
+
+    #scaling the image to a set width of 1056
+    newW = 1056
     rW = origW / float(newW)
+    newH = origH * rW
+    newH = int(newH/32)*32
     rH = origH / float(newH)
 
     # resize the image and grab the new image dimensions
