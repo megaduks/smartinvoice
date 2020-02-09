@@ -69,19 +69,25 @@ def decode_predictions(scores, geometry):
     return (rects, confidences)
 
 
+def clean_output(text):
+    # Remove non-ASCII characters from the input string
+    text = "".join([c if ord(c) < 128 else "" for c in text]).strip()
+    return text
+
+
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-i", "--image", nargs='+', default=[], type=str,
                 help="path to input image")
 ap.add_argument("-east", "--east", type=str,
                 help="path to input EAST text detector")
-ap.add_argument("-c", "--min-confidence", type=float, default=0.4,
+ap.add_argument("-c", "--min-confidence", type=float, default=0.5,
                 help="minimum probability required to inspect a region")
-ap.add_argument("-w", "--width", type=int, default=33*32,
+ap.add_argument("-w", "--width", type=int, default=1056,
                 help="nearest multiple of 32 for resized width")
 ap.add_argument("-e", "--height", type=int, default=1920,
                 help="nearest multiple of 32 for resized height")
-ap.add_argument("-p", "--padding", type=float, default=0.15,
+ap.add_argument("-p", "--padding", type=float, default=0.1,
                 help="amount of padding to add to each border of ROI")
 ap.add_argument("-d", "--display", type=bool, default=False,
                 help="whenever to display the images with bounding boxes and text")
@@ -159,31 +165,29 @@ for pathToImg in tqdm(args['image']):
         # wish to use the LSTM neural net model for OCR, and finally
         # (3) an OEM value, in this case, 7 which implies that we are
         # treating the ROI as a single line of text
-        config = "-l pol --oem 3 --psm 7"
+        config = "-l pol --oem 3  --psm 7"
         text = pytesseract.image_to_string(roi, config=config)
 
         # add the bounding box coordinates and OCR'd text to the list
         # of results
         results.append(((startX, startY, endX, endY), text))
 
-    # sort the results bounding box coordinates from top to bottom and left to right
+    # sort the results bounding box coordinates from top to bottom:
     results = sorted(results, key=lambda r: r[0][1])
-    results = sorted(results, key=lambda r: r[0][0])
+    # TODO : sort it better, from left to right as well
 
     # This part is used for displaying bounding boxes and text prediction on the image, useful for adjusting parameters
     if args['display']:
         output = orig.copy()
         for ((startX, startY, endX, endY), text) in results:
 
-            # strip out non-ASCII text so we can draw the text on the image
             # using OpenCV, then draw the text and a bounding box surrounding
             # the text region of the input image
-            text = "".join([c if ord(c) < 128 else "" for c in text]).strip()
 
             cv2.rectangle(output, (startX, startY), (endX, endY),
                           (0, 0, 255), 2)
-            cv2.putText(output, text, (startX, startY - 20),
-                        cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3)
+            #cv2.putText(output, clean_output(text), (startX, startY - 20),
+                        #cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3)
 
             # show the output image
         cv2.imshow("Text Detection", output)
