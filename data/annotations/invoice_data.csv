@@ -1,4 +1,4 @@
-filename ,typ_faktury,numer_faktury,numer_konta,kwota_brutto ,stawka_VAT,sprzedawca_nip,sprzedawca,inne
+filename,typ_faktury,numer_faktury,numer_konta,kwota_brutto,stawka_VAT,sprzedawca_nip,sprzedawca,inne
 00fc37ffffffff00.png,fv,5531005152,,649,23,5271037727,Polkomtel Sp. z o. o.,
 00ffbfffffffff00.png,fv,13/2019,44 1560 0013 2365 3372 3000 0003,4022.1,23,PL6991013224,Arkadiusz Szwarc Przedsiębiorstwo Handlowo Usługowe “Szwarc”,
 00ffcfefefefff00.png,fv,FV00273,53 1090 1258 0000 0000 2504 6905,8610,23,6961411167,Usługi tapicerskie i ślusarskie Mariola Białek,
