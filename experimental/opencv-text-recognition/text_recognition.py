@@ -9,7 +9,7 @@ import pytesseract
 import argparse
 import cv2
 import os
-
+from tqdm import tqdm
 
 def decode_predictions(scores, geometry):
     # grab the number of rows and columns from the scores volume, then
@@ -83,6 +83,8 @@ ap.add_argument("-e", "--height", type=int, default=1920,
                 help="nearest multiple of 32 for resized height")
 ap.add_argument("-p", "--padding", type=float, default=0.15,
                 help="amount of padding to add to each border of ROI")
+ap.add_argument("-d", "--display", type=bool, default=False,
+                help="whenever to display the images with bounding boxes and text")
 args = vars(ap.parse_args())
 
 # load the pre-trained EAST text detector
@@ -96,9 +98,7 @@ layerNames = [
     "feature_fusion/Conv_7/Sigmoid",
     "feature_fusion/concat_3"]
 
-
-
-for pathToImg in args['image']:
+for pathToImg in tqdm(args['image']):
 
     # load the input image and grab the image dimensions
     image = cv2.imread(pathToImg)
@@ -159,7 +159,7 @@ for pathToImg in args['image']:
         # wish to use the LSTM neural net model for OCR, and finally
         # (3) an OEM value, in this case, 7 which implies that we are
         # treating the ROI as a single line of text
-        config = ("-l pol --oem 3 --psm 7")
+        config = "-l pol --oem 3 --psm 7"
         text = pytesseract.image_to_string(roi, config=config)
 
         # add the bounding box coordinates and OCR'd text to the list
@@ -171,22 +171,23 @@ for pathToImg in args['image']:
     results = sorted(results, key=lambda r: r[0][0])
 
     # This part is used for displaying bounding boxes and text prediction on the image, useful for adjusting parameters
-    '''output = orig.copy()
-    for ((startX, startY, endX, endY), text) in results:
+    if args['display']:
+        output = orig.copy()
+        for ((startX, startY, endX, endY), text) in results:
 
-        # strip out non-ASCII text so we can draw the text on the image
-        # using OpenCV, then draw the text and a bounding box surrounding
-        # the text region of the input image
-        # text = "".join([c if ord(c) < 128 else "" for c in text]).strip()
-        # output = orig.copy()
-        cv2.rectangle(output, (startX, startY), (endX, endY),
-                      (0, 0, 255), 2)
-        #   cv2.putText(output, text, (startX, startY - 20),
-         #           cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3)
-    
-        # show the output image
-    cv2.imshow("Text Detection", output)
-    cv2.waitKey(0)'''
+            # strip out non-ASCII text so we can draw the text on the image
+            # using OpenCV, then draw the text and a bounding box surrounding
+            # the text region of the input image
+            text = "".join([c if ord(c) < 128 else "" for c in text]).strip()
+
+            cv2.rectangle(output, (startX, startY), (endX, endY),
+                          (0, 0, 255), 2)
+            cv2.putText(output, text, (startX, startY - 20),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3)
+
+            # show the output image
+        cv2.imshow("Text Detection", output)
+        cv2.waitKey(0)
 
     # save results to a .txt file:
     base = os.path.basename(pathToImg)
