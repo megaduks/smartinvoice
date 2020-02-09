@@ -1,0 +1,52 @@
+{
+  "schema_version": "0.2",
+  "numer_faktury": "FA/3/07/2019",
+  "typ_faktury": "faktura_vat",
+  "data_sprzedazy": "2019-07-25",
+  "data_wystawienia": "2019-07-25",
+  "nip_sprzedawcy": "7661829704",
+  "nazwa_sprzedawcy": "GOSPODARSTWO ROLNE DAMIAN KAMIŃSKI",
+  "nip_nabywcy": "7772144056",
+  "nazwa_nabywcy": "PHU Szwarc Wojciech Szwarc",
+  "towary": [
+    {
+      "lp": "1",
+      "nazwa": "Płody rolne zgodnie z umową",
+      "miara": "t",
+      "ilosc": "40",
+      "cena_jednostkowa": "750,00",
+      "wartosc_netto": "30 000,00",
+      "stawka_podatku": "5",
+      "kwota_podatku": "",
+      "wartosc_brutto": ""
+    }
+
+  ],
+  "razem_kwota_netto": "0,00",
+  "razem_kwota_podatku_vat": "0,00",
+  "razem_kwota_brutto": "0,00",
+  "przedplata_kwota_netto": "",
+  "przedplata_kwota_podatku_vat": "",
+  "przedplata_kwota_brutto": "",
+  "rozliczenie_vat": [
+    {
+      "stawka_podatku": "5",
+      "wartosc_netto": "0,00",
+      "podatek": "0,00",
+      "wartosc_brutto": "0,00"
+    }
+  ],
+  "czy_usluga": "",
+  "forma_platnosci": "",
+  "termin_platnosci": "",
+  "numer_konta_sprzedawcy": "",
+  "do_zaplaty": "",
+  "zaplacono": "31 500,00",
+  "zaplacono_w_dniu": "",
+  "razem_do_zwrotu": "",
+  "faktura_zaliczkowa": {
+    "data": "2019-06-13",
+    "numer": "FA/1/06/2019",
+    "wartosc": "31500,00"
+  }
+}

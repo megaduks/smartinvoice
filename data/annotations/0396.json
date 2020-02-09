@@ -1,0 +1,48 @@
+{
+  "schema_version": "0.2",
+  "numer_faktury": "703/19/FP",
+  "typ_faktury": "faktura_vat",
+  "data_sprzedazy": "2019-09-02",
+  "data_wystawienia": "2019-09-02",
+  "nip_sprzedawcy": "6762460306",
+  "nazwa_sprzedawcy": "POLAR SPORT Krystyna Radwańska sp.j.",
+  "nip_nabywcy": "7772144056",
+  "nazwa_nabywcy": "PHU Szwarc Wojciech Szwarc",
+  "towary": [
+    {
+      "lp": "1",
+      "nazwa": "PL FJALL KANKEN ART SUMMER LANDSCAPE 970",
+      "miara": "sztuki",
+      "ilosc": "1",
+      "cena_jednostkowa": "323,32",
+      "wartosc_netto": "262,86",
+      "stawka_podatku": "23",
+      "kwota_podatku": "60,46",
+      "wartosc_brutto": "323,32"
+    }
+
+  ],
+  "razem_kwota_netto": "262,86",
+  "razem_kwota_podatku_vat": "60,46",
+  "razem_kwota_brutto": "323,32",
+  "przedplata_kwota_netto": "",
+  "przedplata_kwota_podatku_vat": "",
+  "przedplata_kwota_brutto": "",
+  "rozliczenie_vat": [
+    {
+      "stawka_podatku": "23",
+      "wartosc_netto": "262,86",
+      "podatek": "60,46",
+      "wartosc_brutto": "323,32"
+    }
+  ],
+  "czy_usluga": "",
+  "forma_platnosci": "gotówka",
+  "termin_platnosci": "",
+  "numer_konta_sprzedawcy": "",
+  "do_zaplaty": "6480,00",
+  "zaplacono": "",
+  "zaplacono_w_dniu": "2019-09-02",
+  "razem_do_zwrotu": "",
+  "faktura_zaliczkowa": ""
+}

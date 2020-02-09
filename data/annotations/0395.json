@@ -1,0 +1,48 @@
+{
+  "schema_version": "0.2",
+  "numer_faktury": "FV/2229/2019/DZ",
+  "typ_faktury": "faktura_vat",
+  "data_sprzedazy": "2019-06-08",
+  "data_wystawienia": "",
+  "nip_sprzedawcy": "",
+  "nazwa_sprzedawcy": "Uzdrowisko Świeradów-Czerniawa Sp. z o.o. - Grupa PGU",
+  "nip_nabywcy": "7772144056",
+  "nazwa_nabywcy": "PHU Szwarc Wojciech",
+  "towary": [
+    {
+      "lp": "1",
+      "nazwa": "pobyty hotelowe pokój LUX 1-os.",
+      "miara": "doba",
+      "ilosc": "1",
+      "cena_jednostkowa": "180,00",
+      "wartosc_netto": "166,67",
+      "stawka_podatku": "8",
+      "kwota_podatku": "13,33",
+      "wartosc_brutto": "180,00"
+    }
+
+  ],
+  "razem_kwota_netto": "166,67",
+  "razem_kwota_podatku_vat": "13,33",
+  "razem_kwota_brutto": "180,00",
+  "przedplata_kwota_netto": "166,67",
+  "przedplata_kwota_podatku_vat": "13,33",
+  "przedplata_kwota_brutto": "180,00",
+  "rozliczenie_vat": [
+    {
+      "stawka_podatku": "8",
+      "wartosc_netto": "166,67",
+      "podatek": "13,33",
+      "wartosc_brutto": "180,00"
+    }
+  ],
+  "czy_usluga": "",
+  "forma_platnosci": "karta",
+  "termin_platnosci": "",
+  "numer_konta_sprzedawcy": "",
+  "do_zaplaty": "",
+  "zaplacono": "180,00",
+  "zaplacono_w_dniu": "",
+  "razem_do_zwrotu": "",
+  "faktura_zaliczkowa": ""
+}
