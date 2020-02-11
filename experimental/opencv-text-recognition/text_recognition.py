@@ -40,23 +40,26 @@ def correct_skew(image, delta=1, limit=5):
 
 
 def group_boxes(boxes):
-
+    # sorting bounding boxes into lines of text, returns a list of a list of np.arrays
+    # first, sorting from top to bottom
     boxes = sorted(boxes, key=lambda r: r[1])
     heights = []
     for box in boxes:
         heights.append(abs(box[1]-box[3]))
-
+    # getting the average height of the bounding boxes to approximate the height of single line of text
     avgHeight = int(sum(heights)/len(heights))
-    verticalThreshhold = avgHeight/2
+    # verticalThreshold to determine if a bounding box belongs to the same line
+    verticalThreshold = avgHeight/2
     groups = []
+    groupedBoxes=[]
     idx1 = 0
-    print(f"Starting to group:, avgh = {avgHeight}")
+    # clustering boxes of similar Y-value into subgroups
     while idx1 < len(boxes)-1:
         subGroup = []
         subGroup.append(boxes[idx1])
         idx2 = idx1 + 1
         while idx2 <= len(boxes)-1:
-            if abs(boxes[idx2][1] - boxes[idx1][1]) <= verticalThreshhold: # and boxes[idx2][] - boxes[idx1][3] <= verticalThreshhold:
+            if abs(boxes[idx2][1] - boxes[idx1][1]) <= verticalThreshold:
                 subGroup.append(boxes[idx2])
                 idx2 += 1
             else:
@@ -64,8 +67,7 @@ def group_boxes(boxes):
         idx1 = idx2
         groups.append(subGroup)
 
-    groupedBoxes=[]
-
+    # creating a new box that contains the ones in the subgroup
     for sub in groups:
         startX = min([x[0] for x in sub])
         startY = min([x[1] for x in sub])
@@ -167,7 +169,7 @@ ap.add_argument("-e", "--height", type=int, default=1920,
 ap.add_argument("-p", "--padding", type=float, default=0.1,
                 help="amount of padding to add to each border of ROI")
 ap.add_argument("-d", "--display", type=bool, default=False,
-                help="whenever to display the images with bounding boxes and text")
+                help="whenever to display the images with bounding boxes")
 args = vars(ap.parse_args())
 
 # load the pre-trained EAST text detector
@@ -183,9 +185,10 @@ layerNames = [
 
 for pathToImg in tqdm(args['image']):
 
-    print(f"[INFO] Processing image: {pathToImg}")
+    # print(f"[INFO] Processing image: {pathToImg}")
     # load the input image and grab the image dimensions
     image = cv2.imread(pathToImg)
+    # rotate the image to correct skew
     image = correct_skew(image)
 
     orig = image.copy()
