@@ -97,13 +97,6 @@ def group_boxes(boxes):
 
 
 def resize_img(orgH : int, width : int):
-    #the image to a set width of 1056
-    newW = 1056
-    ratioW = origW / float(newW)
-    newH = origH / ratioW
-    newH = int(newH/32)*32
-    ratioH = origH / float(newH)
-
     #TODO: resize horizontal images
     pass
 
@@ -188,6 +181,8 @@ ap.add_argument("-p", "--padding", type=float, default=0.1,
                 help="amount of padding to add to each border of ROI")
 ap.add_argument("-d", "--display", type=bool, default=False,
                 help="whenever to display the images with bounding boxes")
+ap.add_argument("-pt", "--padText", type=bool, default=True,
+                help="add space to every output from tesseract")
 args = vars(ap.parse_args())
 
 # load the pre-trained EAST text detector
@@ -220,7 +215,6 @@ for pathToImg in tqdm(args['image']):
 
     # resize the image and grab the new image dimensions
     image = cv2.resize(image, (newW, newH))
-
 
     (H, W) = image.shape[:2]
 
@@ -270,6 +264,8 @@ for pathToImg in tqdm(args['image']):
         # treating the ROI as a single line of text
         config = "-l pol --oem 1  --psm 7"
         text = pytesseract.image_to_string(roi, config=config)
+        if args['padText']:
+            text += " "
 
         # add the bounding box coordinates and OCR'd text to the list
         # of results
@@ -277,7 +273,13 @@ for pathToImg in tqdm(args['image']):
 
     # sort the results bounding box coordinates from top to bottom:
     results = sorted(results, key=lambda r: r[0][1])
-    # TODO : sort it better, from left to right as well
+
+    # save results to a .txt file:
+    base = os.path.basename(pathToImg)
+    imgName, ext = base.split(".")
+    with open(f"{imgName}.txt", "w") as file:
+        for _, text in results:
+            file.write(text)
 
     # This part is used for displaying bounding boxes and text prediction on the image, useful for adjusting parameters
     if args['display']:
@@ -293,15 +295,7 @@ for pathToImg in tqdm(args['image']):
                         #cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3)
 
             # show the output image
-        #cv2.imshow("Text Detection", output)
-        cv2.imwrite("22notrouped.png", output)
-        #cv2.waitKey(0)
-        #cv2.destroyAllWindows()
-
-    # save results to a .txt file:
-    '''base = os.path.basename(pathToImg)
-    imgName, ext = base.split(".")
-    with open("{}.txt".format(imgName), "w") as file:
-        for _, text in results:
-            file.write(text)
-'''
+        cv2.imshow("Text Detection", output)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+        cv2.imwrite(f"{imgName}withBB.png", output)
