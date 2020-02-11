@@ -50,6 +50,7 @@ def group_boxes(boxes):
     avgHeight = int(sum(heights)/len(heights))
     # verticalThreshold to determine if a bounding box belongs to the same line
     verticalThreshold = avgHeight/2
+    horizontalThreshold = avgHeight*10
     groups = []
     groupedBoxes=[]
     idx1 = 0
@@ -59,7 +60,8 @@ def group_boxes(boxes):
         subGroup.append(boxes[idx1])
         idx2 = idx1 + 1
         while idx2 <= len(boxes)-1:
-            if abs(boxes[idx2][1] - boxes[idx1][1]) <= verticalThreshold:
+            if abs(boxes[idx2][1] - boxes[idx1][1]) <= verticalThreshold and \
+                    abs(boxes[idx2][3] - boxes[idx1][3]) <= verticalThreshold:
                 subGroup.append(boxes[idx2])
                 idx2 += 1
             else:
@@ -67,6 +69,22 @@ def group_boxes(boxes):
         idx1 = idx2
         groups.append(subGroup)
 
+    '''
+    for box in boxes:
+        subGroup = []
+        currBox = box
+        del box
+        subGroup.append(currBox)
+        end = currBox[2]
+        for nBox in boxes:
+            if abs(currBox[1] - nBox[1]) <= verticalThreshold and abs(currBox[3] - nBox[3]) <= verticalThreshold:
+                subGroup.append(nBox)
+                end = nBox[2]
+                del nBox
+        groups.append(subGroup)
+    '''
+
+    # startX, startY, endX, endY
     # creating a new box that contains the ones in the subgroup
     for sub in groups:
         startX = min([x[0] for x in sub])
@@ -217,7 +235,6 @@ for pathToImg in tqdm(args['image']):
     # suppress weak, overlapping bounding boxes
     (rectangles, confidences) = decode_predictions(scores, geometry)
     boxes = non_max_suppression(np.array(rectangles), probs=confidences)
-    print(type(boxes[0]))
     boxes = group_boxes(boxes)
     # initialize the list of results
     results = []
@@ -276,12 +293,15 @@ for pathToImg in tqdm(args['image']):
                         #cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3)
 
             # show the output image
-        cv2.imshow("Text Detection", output)
-        cv2.waitKey(0)
+        #cv2.imshow("Text Detection", output)
+        cv2.imwrite("22notrouped.png", output)
+        #cv2.waitKey(0)
+        #cv2.destroyAllWindows()
 
     # save results to a .txt file:
-    base = os.path.basename(pathToImg)
+    '''base = os.path.basename(pathToImg)
     imgName, ext = base.split(".")
     with open("{}.txt".format(imgName), "w") as file:
         for _, text in results:
             file.write(text)
+'''
