@@ -7,26 +7,98 @@ from imutils.object_detection import non_max_suppression
 import numpy as np
 import pytesseract
 import argparse
-import cv2
 import os
 from tqdm import tqdm
+from scipy.ndimage import interpolation as inter
+import cv2
 
 
-def sort_boxes(boxes):
-    #TODO: sort boxes by they location in the image
-    pass
+def correct_skew(image, delta=1, limit=5):
+    def determine_score(arr, angle):
+        data = inter.rotate(arr, angle, reshape=False, order=0)
+        histogram = np.sum(data, axis=1)
+        score = np.sum((histogram[1:] - histogram[:-1]) ** 2)
+        return histogram, score
 
-def resize_img(orgH, org, width):
-    #the image to a set width of 1056
-    newW = 1056
-    rW = origW / float(newW)
-    newH = origH / rW
-    newH = int(newH/32)*32
-    rH = origH / float(newH)
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
 
+    scores = []
+    angles = np.arange(-limit, limit + delta, delta)
+    for angle in angles:
+        histogram, score = determine_score(thresh, angle)
+        scores.append(score)
+
+    best_angle = angles[scores.index(max(scores))]
+
+    (h, w) = image.shape[:2]
+    center = (w // 2, h // 2)
+    M = cv2.getRotationMatrix2D(center, best_angle, 1.0)
+    rotated = cv2.warpAffine(image, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+
+    return rotated
+
+
+def group_boxes(boxes):
+    # sorting bounding boxes into lines of text, returns a list of a list of np.arrays
+    # first, sorting from top to bottom
+    boxes = sorted(boxes, key=lambda r: r[1])
+    heights = []
+    for box in boxes:
+        heights.append(abs(box[1]-box[3]))
+    # getting the average height of the bounding boxes to approximate the height of single line of text
+    avgHeight = int(sum(heights)/len(heights))
+    # verticalThreshold to determine if a bounding box belongs to the same line
+    verticalThreshold = avgHeight/2
+    horizontalThreshold = avgHeight*10
+    groups = []
+    groupedBoxes=[]
+    idx1 = 0
+    # clustering boxes of similar Y-value into subgroups
+    while idx1 < len(boxes)-1:
+        subGroup = []
+        subGroup.append(boxes[idx1])
+        idx2 = idx1 + 1
+        while idx2 <= len(boxes)-1:
+            if abs(boxes[idx2][1] - boxes[idx1][1]) <= verticalThreshold and \
+                    abs(boxes[idx2][3] - boxes[idx1][3]) <= verticalThreshold:
+                subGroup.append(boxes[idx2])
+                idx2 += 1
+            else:
+                break
+        idx1 = idx2
+        groups.append(subGroup)
+
+    '''
+    for box in boxes:
+        subGroup = []
+        currBox = box
+        del box
+        subGroup.append(currBox)
+        end = currBox[2]
+        for nBox in boxes:
+            if abs(currBox[1] - nBox[1]) <= verticalThreshold and abs(currBox[3] - nBox[3]) <= verticalThreshold:
+                subGroup.append(nBox)
+                end = nBox[2]
+                del nBox
+        groups.append(subGroup)
+    '''
+
+    # startX, startY, endX, endY
+    # creating a new box that contains the ones in the subgroup
+    for sub in groups:
+        startX = min([x[0] for x in sub])
+        startY = min([x[1] for x in sub])
+        endX = max([x[2] for x in sub])
+        endY = max([x[3] for x in sub])
+        groupedBoxes.append(np.asarray([startX, startY, endX, endY]))
+
+    return groupedBoxes
+
+
+def resize_img(orgH : int, width : int):
     #TODO: resize horizontal images
     pass
-
 
 
 def decode_predictions(scores, geometry):
@@ -34,7 +106,7 @@ def decode_predictions(scores, geometry):
     # initialize our set of bounding box rectangles and corresponding
     # confidence scores
     (numRows, numCols) = scores.shape[2:4]
-    rects = []
+    rectangles = []
     confidences = []
 
     # loop over the number of rows
@@ -80,11 +152,11 @@ def decode_predictions(scores, geometry):
 
             # add the bounding box coordinates and probability score
             # to our respective lists
-            rects.append((startX, startY, endX, endY))
+            rectangles.append((startX, startY, endX, endY))
             confidences.append(scoresData[x])
 
     # return a tuple of the bounding boxes and associated confidences
-    return (rects, confidences)
+    return (rectangles, confidences)
 
 
 def clean_output(text):
@@ -102,19 +174,20 @@ ap.add_argument("-east", "--east", type=str,
 ap.add_argument("-c", "--min-confidence", type=float, default=0.5,
                 help="minimum probability required to inspect a region")
 ap.add_argument("-w", "--width", type=int, default=1056,
-               help="nearest multiple of 32 for resized width")
+                help="nearest multiple of 32 for resized width")
 ap.add_argument("-e", "--height", type=int, default=1920,
                 help="nearest multiple of 32 for resized height")
-ap.add_argument("-p", "--padding", type=float, default=0.15,
+ap.add_argument("-p", "--padding", type=float, default=0.1,
                 help="amount of padding to add to each border of ROI")
 ap.add_argument("-d", "--display", type=bool, default=False,
-                help="whenever to display the images with bounding boxes and text")
+                help="whenever to display the images with bounding boxes")
+ap.add_argument("-pt", "--padText", type=bool, default=True,
+                help="add space to every output from tesseract")
 args = vars(ap.parse_args())
 
 # load the pre-trained EAST text detector
 print("[INFO] loading EAST text detector...")
 net = cv2.dnn.readNet(args["east"])
-
 # define the two output layer names for the EAST detector model that
 # we are interested -- the first is the output probabilities and the
 # second can be used to derive the bounding box coordinates of text
@@ -124,22 +197,24 @@ layerNames = [
 
 for pathToImg in tqdm(args['image']):
 
-    print("[INFO] Processing image: {}".format(pathToImg))
+    # print(f"[INFO] Processing image: {pathToImg}")
     # load the input image and grab the image dimensions
     image = cv2.imread(pathToImg)
+    # rotate the image to correct skew
+    image = correct_skew(image)
+
     orig = image.copy()
     (origH, origW) = image.shape[:2]
 
     # set the new width and height and then determine the ratio in change
     # for both the width and height
     (newW, newH) = (args["width"], args["height"])
-    rW = origW / float(newW)
-    rH = origH / float(newH)
-
-
+    ratioW = origW / float(newW)
+    ratioH = origH / float(newH)
 
     # resize the image and grab the new image dimensions
     image = cv2.resize(image, (newW, newH))
+
     (H, W) = image.shape[:2]
 
     # construct a blob from the image and then perform a forward pass of
@@ -151,9 +226,9 @@ for pathToImg in tqdm(args['image']):
 
     # decode the predictions, then  apply non-maxima suppression to
     # suppress weak, overlapping bounding boxes
-    (rects, confidences) = decode_predictions(scores, geometry)
-    boxes = non_max_suppression(np.array(rects), probs=confidences)
-
+    (rectangles, confidences) = decode_predictions(scores, geometry)
+    boxes = non_max_suppression(np.array(rectangles), probs=confidences)
+    boxes = group_boxes(boxes)
     # initialize the list of results
     results = []
 
@@ -161,10 +236,10 @@ for pathToImg in tqdm(args['image']):
     for (startX, startY, endX, endY) in boxes:
         # scale the bounding box coordinates based on the respective
         # ratios
-        startX = int(startX * rW)
-        startY = int(startY * rH)
-        endX = int(endX * rW)
-        endY = int(endY * rH)
+        startX = int(startX * ratioW)
+        startY = int(startY * ratioH)
+        endX = int(endX * ratioW)
+        endY = int(endY * ratioH)
 
         # in order to obtain a better OCR of the text we can potentially
         # apply a bit of padding surrounding the bounding box -- here we
@@ -186,8 +261,10 @@ for pathToImg in tqdm(args['image']):
         # wish to use the LSTM neural net model for OCR, and finally
         # (3) an OEM value, in this case, 7 which implies that we are
         # treating the ROI as a single line of text
-        config = "-l pol --oem 3  --psm 7"
+        config = "-l pol --oem 1  --psm 7"
         text = pytesseract.image_to_string(roi, config=config)
+        if args['padText']:
+            text += " "
 
         # add the bounding box coordinates and OCR'd text to the list
         # of results
@@ -195,7 +272,13 @@ for pathToImg in tqdm(args['image']):
 
     # sort the results bounding box coordinates from top to bottom:
     results = sorted(results, key=lambda r: r[0][1])
-    # TODO : sort it better, from left to right as well
+
+    # save results to a .txt file:
+    base = os.path.basename(pathToImg)
+    imgName, ext = base.split(".")
+    with open(f"{imgName}.txt", "w") as file:
+        for _, text in results:
+            file.write(text)
 
     # This part is used for displaying bounding boxes and text prediction on the image, useful for adjusting parameters
     if args['display']:
@@ -213,10 +296,5 @@ for pathToImg in tqdm(args['image']):
             # show the output image
         cv2.imshow("Text Detection", output)
         cv2.waitKey(0)
-
-    # save results to a .txt file:
-    base = os.path.basename(pathToImg)
-    imgName, ext = base.split(".")
-    with open("{}.txt".format(imgName), "w") as file:
-        for _, text in results:
-            file.write(text)
+        cv2.destroyAllWindows()
+        cv2.imwrite(f"{imgName}withBB.png", output)
