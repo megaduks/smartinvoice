@@ -1,0 +1,363 @@
+███████████████████████
+█ █ █ █  ▜█ █ █ █ █   █
+█ █ █ █ █ █ █ █ █ █ ███
+█ █   █ █ █ █ █ █ █ ▌ █
+█ █████ █ █ █ █ █ █ █ █
+█     █  ▟█     █ █   █
+███████████████████████
+ludwig v0.2.1 - Train
+
+Experiment name: experiment
+Model name: run
+Output path: results/experiment_run_0
+
+
+ludwig_version: '0.2.1'
+command: ('/home/mikolaj/.virtualenvs/python3/bin/ludwig train --data_csv train.csv '
+ '--model_definition_file model_definition.yaml')
+commit_hash: 'a51d1d60995e'
+random_seed: 42
+input_data: 'train.csv'
+model_definition: {   'combiner': {'type': 'concat'},
+    'input_features': [   {   'cell_type': 'lstm',
+                              'encoder': 'cnnrnn',
+                              'level': 'char',
+                              'name': 'doc_txt',
+                              'tied_weights': None,
+                              'type': 'text'}],
+    'output_features': [   {   'dependencies': [],
+                               'loss': {   'class_similarities_temperature': 0,
+                                           'class_weights': 1,
+                                           'confidence_penalty': 0,
+                                           'distortion': 1,
+                                           'labels_smoothing': 0,
+                                           'negative_samples': 0,
+                                           'robust_lambda': 0,
+                                           'sampler': None,
+                                           'type': 'softmax_cross_entropy',
+                                           'unique': False,
+                                           'weight': 1},
+                               'name': 'class',
+                               'reduce_dependencies': 'sum',
+                               'reduce_input': 'sum',
+                               'top_k': 3,
+                               'type': 'category'}],
+    'preprocessing': {   'audio': {   'audio_feature': {'type': 'raw'},
+                                      'audio_file_length_limit_in_s': 7.5,
+                                      'in_memory': True,
+                                      'missing_value_strategy': 'backfill',
+                                      'norm': None,
+                                      'padding_value': 0},
+                         'bag': {   'fill_value': '',
+                                    'lowercase': False,
+                                    'missing_value_strategy': 'fill_with_const',
+                                    'most_common': 10000,
+                                    'tokenizer': 'space'},
+                         'binary': {   'fill_value': 0,
+                                       'missing_value_strategy': 'fill_with_const'},
+                         'category': {   'fill_value': '<UNK>',
+                                         'lowercase': False,
+                                         'missing_value_strategy': 'fill_with_const',
+                                         'most_common': 10000},
+                         'date': {   'datetime_format': None,
+                                     'fill_value': '',
+                                     'missing_value_strategy': 'fill_with_const'},
+                         'force_split': False,
+                         'h3': {   'fill_value': 576495936675512319,
+                                   'missing_value_strategy': 'fill_with_const'},
+                         'image': {   'in_memory': True,
+                                      'missing_value_strategy': 'backfill',
+                                      'num_processes': 1,
+                                      'resize_method': 'interpolate',
+                                      'scaling': 'pixel_normalization'},
+                         'numerical': {   'fill_value': 0,
+                                          'missing_value_strategy': 'fill_with_const',
+                                          'normalization': None},
+                         'sequence': {   'fill_value': '',
+                                         'lowercase': False,
+                                         'missing_value_strategy': 'fill_with_const',
+                                         'most_common': 20000,
+                                         'padding': 'right',
+                                         'padding_symbol': '<PAD>',
+                                         'sequence_length_limit': 256,
+                                         'tokenizer': 'space',
+                                         'unknown_symbol': '<UNK>',
+                                         'vocab_file': None},
+                         'set': {   'fill_value': '',
+                                    'lowercase': False,
+                                    'missing_value_strategy': 'fill_with_const',
+                                    'most_common': 10000,
+                                    'tokenizer': 'space'},
+                         'split_probabilities': (0.7, 0.1, 0.2),
+                         'stratify': None,
+                         'text': {   'char_most_common': 70,
+                                     'char_sequence_length_limit': 1024,
+                                     'char_tokenizer': 'characters',
+                                     'char_vocab_file': None,
+                                     'fill_value': '',
+                                     'lowercase': True,
+                                     'missing_value_strategy': 'fill_with_const',
+                                     'padding': 'right',
+                                     'padding_symbol': '<PAD>',
+                                     'unknown_symbol': '<UNK>',
+                                     'word_most_common': 20000,
+                                     'word_sequence_length_limit': 256,
+                                     'word_tokenizer': 'space_punct',
+                                     'word_vocab_file': None},
+                         'timeseries': {   'fill_value': '',
+                                           'missing_value_strategy': 'fill_with_const',
+                                           'padding': 'right',
+                                           'padding_value': 0,
+                                           'timeseries_length_limit': 256,
+                                           'tokenizer': 'space'},
+                         'vector': {   'fill_value': '',
+                                       'missing_value_strategy': 'fill_with_const'}},
+    'training': {   'batch_size': 5,
+                    'bucketing_field': None,
+                    'decay': False,
+                    'decay_rate': 0.96,
+                    'decay_steps': 10000,
+                    'dropout_rate': 0.0,
+                    'early_stop': 10,
+                    'epochs': 100,
+                    'eval_batch_size': 0,
+                    'gradient_clipping': None,
+                    'increase_batch_size_on_plateau': 0,
+                    'increase_batch_size_on_plateau_max': 512,
+                    'increase_batch_size_on_plateau_patience': 5,
+                    'increase_batch_size_on_plateau_rate': 2,
+                    'learning_rate': 0.001,
+                    'learning_rate_warmup_epochs': 3,
+                    'optimizer': {   'beta1': 0.9,
+                                     'beta2': 0.999,
+                                     'epsilon': 1e-08,
+                                     'type': 'adam'},
+                    'reduce_learning_rate_on_plateau': 0,
+                    'reduce_learning_rate_on_plateau_patience': 5,
+                    'reduce_learning_rate_on_plateau_rate': 0.5,
+                    'regularization_lambda': 0,
+                    'regularizer': 'l2',
+                    'staircase': False,
+                    'validation_field': 'combined',
+                    'validation_measure': 'accuracy'}}
+
+
+Found hdf5 and json with the same filename of the csv, using them instead
+Using full hdf5 and json
+Loading data from: train.hdf5
+Loading metadata from: train.json
+Training set: 70
+Validation set: 12
+Test set: 18
+  embedding_size (256) is greater than vocab_size (72). Setting embedding size to be equal to vocab_size.
+
+╒══════════╕
+│ TRAINING │
+╘══════════╛
+
+
+Epoch   1
+Training:   0%|          | 0/14 [00:00<?, ?it/s]Training:   7%|▋         | 1/14 [00:02<00:26,  2.00s/it]Training:  14%|█▍        | 2/14 [00:03<00:22,  1.87s/it]Training:  21%|██▏       | 3/14 [00:05<00:19,  1.79s/it]Training:  29%|██▊       | 4/14 [00:06<00:17,  1.73s/it]Training:  36%|███▌      | 5/14 [00:08<00:16,  1.87s/it]Training:  43%|████▎     | 6/14 [00:10<00:15,  1.89s/it]Training:  50%|█████     | 7/14 [00:12<00:13,  1.91s/it]Training:  57%|█████▋    | 8/14 [00:14<00:11,  1.93s/it]Training:  64%|██████▍   | 9/14 [00:17<00:10,  2.02s/it]Training:  71%|███████▏  | 10/14 [00:19<00:08,  2.06s/it]Training:  79%|███████▊  | 11/14 [00:21<00:06,  2.09s/it]Training:  86%|████████▌ | 12/14 [00:23<00:04,  2.11s/it]Training:  93%|█████████▎| 13/14 [00:25<00:02,  2.14s/it]Training: 100%|██████████| 14/14 [00:28<00:00,  2.18s/it]
+Evaluation train:   0%|          | 0/14 [00:00<?, ?it/s]Evaluation train:   7%|▋         | 1/14 [00:00<00:05,  2.41it/s]Evaluation train:  14%|█▍        | 2/14 [00:00<00:04,  2.45it/s]Evaluation train:  21%|██▏       | 3/14 [00:01<00:04,  2.63it/s]Evaluation train:  29%|██▊       | 4/14 [00:01<00:03,  2.85it/s]Evaluation train:  36%|███▌      | 5/14 [00:01<00:03,  2.98it/s]Evaluation train:  43%|████▎     | 6/14 [00:01<00:02,  3.19it/s]Evaluation train:  50%|█████     | 7/14 [00:02<00:02,  3.30it/s]Evaluation train:  57%|█████▋    | 8/14 [00:02<00:01,  3.52it/s]Evaluation train:  64%|██████▍   | 9/14 [00:02<00:01,  3.57it/s]Evaluation train:  71%|███████▏  | 10/14 [00:03<00:01,  3.50it/s]Evaluation train:  79%|███████▊  | 11/14 [00:03<00:00,  3.58it/s]Evaluation train:  86%|████████▌ | 12/14 [00:03<00:00,  3.49it/s]Evaluation train:  93%|█████████▎| 13/14 [00:03<00:00,  3.36it/s]Evaluation train: 100%|██████████| 14/14 [00:04<00:00,  3.48it/s]
+Evaluation vali :   0%|          | 0/3 [00:00<?, ?it/s]Evaluation vali :  33%|███▎      | 1/3 [00:00<00:00,  2.84it/s]Evaluation vali :  67%|██████▋   | 2/3 [00:00<00:00,  3.04it/s]Evaluation vali : 100%|██████████| 3/3 [00:00<00:00,  3.40it/s]
+Evaluation test :   0%|          | 0/4 [00:00<?, ?it/s]Evaluation test :  25%|██▌       | 1/4 [00:00<00:00,  3.56it/s]Evaluation test :  50%|█████     | 2/4 [00:00<00:00,  3.69it/s]Evaluation test :  75%|███████▌  | 3/4 [00:00<00:00,  3.71it/s]Evaluation test : 100%|██████████| 4/4 [00:00<00:00,  4.01it/s]
+Took 34.9319s
+╒═════════╤════════╤════════════╤═════════════╕
+│ class   │   loss │   accuracy │   hits_at_k │
+╞═════════╪════════╪════════════╪═════════════╡
+│ train   │ 4.3419 │     0.0571 │      0.1000 │
+├─────────┼────────┼────────────┼─────────────┤
+│ vali    │ 4.8239 │     0.0000 │      0.0000 │
+├─────────┼────────┼────────────┼─────────────┤
+│ test    │ 4.8160 │     0.0000 │      0.0000 │
+╘═════════╧════════╧════════════╧═════════════╛
+Validation accuracy on combined improved, model saved
+
+
+Epoch   2
+Training:   0%|          | 0/14 [00:00<?, ?it/s]Training:   7%|▋         | 1/14 [00:02<00:31,  2.44s/it]Training:  14%|█▍        | 2/14 [00:04<00:28,  2.38s/it]Training:  21%|██▏       | 3/14 [00:06<00:25,  2.33s/it]Training:  29%|██▊       | 4/14 [00:09<00:23,  2.33s/it]Training:  36%|███▌      | 5/14 [00:11<00:20,  2.32s/it]Training:  43%|████▎     | 6/14 [00:13<00:18,  2.27s/it]Training:  50%|█████     | 7/14 [00:15<00:15,  2.25s/it]Training:  57%|█████▋    | 8/14 [00:18<00:13,  2.25s/it]Training:  64%|██████▍   | 9/14 [00:20<00:11,  2.23s/it]Training:  71%|███████▏  | 10/14 [00:22<00:08,  2.18s/it]Training:  79%|███████▊  | 11/14 [00:24<00:06,  2.08s/it]Training:  86%|████████▌ | 12/14 [00:26<00:04,  2.12s/it]Training:  93%|█████████▎| 13/14 [00:28<00:02,  2.15s/it]Training: 100%|██████████| 14/14 [00:30<00:00,  2.16s/it]
+Evaluation train:   0%|          | 0/14 [00:00<?, ?it/s]Evaluation train:   7%|▋         | 1/14 [00:00<00:03,  3.80it/s]Evaluation train:  14%|█▍        | 2/14 [00:00<00:03,  3.76it/s]Evaluation train:  21%|██▏       | 3/14 [00:00<00:02,  3.82it/s]Evaluation train:  29%|██▊       | 4/14 [00:01<00:02,  3.97it/s]Evaluation train:  36%|███▌      | 5/14 [00:01<00:02,  4.12it/s]Evaluation train:  43%|████▎     | 6/14 [00:01<00:01,  4.11it/s]Evaluation train:  50%|█████     | 7/14 [00:01<00:01,  3.88it/s]Evaluation train:  57%|█████▋    | 8/14 [00:02<00:01,  3.78it/s]Evaluation train:  64%|██████▍   | 9/14 [00:02<00:01,  3.86it/s]Evaluation train:  71%|███████▏  | 10/14 [00:02<00:01,  3.83it/s]Evaluation train:  79%|███████▊  | 11/14 [00:02<00:00,  3.92it/s]Evaluation train:  86%|████████▌ | 12/14 [00:03<00:00,  3.98it/s]Evaluation train:  93%|█████████▎| 13/14 [00:03<00:00,  3.96it/s]Evaluation train: 100%|██████████| 14/14 [00:03<00:00,  3.67it/s]
+Evaluation vali :   0%|          | 0/3 [00:00<?, ?it/s]Evaluation vali :  33%|███▎      | 1/3 [00:00<00:00,  3.39it/s]Evaluation vali :  67%|██████▋   | 2/3 [00:00<00:00,  3.44it/s]Evaluation vali : 100%|██████████| 3/3 [00:00<00:00,  3.95it/s]
+Evaluation test :   0%|          | 0/4 [00:00<?, ?it/s]Evaluation test :  25%|██▌       | 1/4 [00:00<00:00,  4.02it/s]Evaluation test :  50%|█████     | 2/4 [00:00<00:00,  3.86it/s]Evaluation test :  75%|███████▌  | 3/4 [00:00<00:00,  3.90it/s]Evaluation test : 100%|██████████| 4/4 [00:00<00:00,  4.21it/s]
+Took 36.1718s
+╒═════════╤════════╤════════════╤═════════════╕
+│ class   │   loss │   accuracy │   hits_at_k │
+╞═════════╪════════╪════════════╪═════════════╡
+│ train   │ 3.8953 │     0.2286 │      0.4714 │
+├─────────┼────────┼────────────┼─────────────┤
+│ vali    │ 4.9413 │     0.0000 │      0.0000 │
+├─────────┼────────┼────────────┼─────────────┤
+│ test    │ 5.1892 │     0.0000 │      0.0000 │
+╘═════════╧════════╧════════════╧═════════════╛
+Last improvement of accuracy on combined happened 1 epoch ago
+
+
+Epoch   3
+Training:   0%|          | 0/14 [00:00<?, ?it/s]Training:   7%|▋         | 1/14 [00:02<00:27,  2.11s/it]Training:  14%|█▍        | 2/14 [00:04<00:25,  2.10s/it]Training:  21%|██▏       | 3/14 [00:06<00:23,  2.11s/it]Training:  29%|██▊       | 4/14 [00:08<00:21,  2.11s/it]Training:  36%|███▌      | 5/14 [00:10<00:18,  2.11s/it]Training:  43%|████▎     | 6/14 [00:12<00:16,  2.12s/it]Training:  50%|█████     | 7/14 [00:14<00:14,  2.10s/it]Training:  57%|█████▋    | 8/14 [00:16<00:12,  2.10s/it]Training:  64%|██████▍   | 9/14 [00:18<00:10,  2.08s/it]Training:  71%|███████▏  | 10/14 [00:20<00:08,  2.09s/it]Training:  79%|███████▊  | 11/14 [00:23<00:06,  2.09s/it]Training:  86%|████████▌ | 12/14 [00:25<00:04,  2.10s/it]Training:  93%|█████████▎| 13/14 [00:27<00:02,  2.10s/it]Training: 100%|██████████| 14/14 [00:29<00:00,  2.09s/it]
+Evaluation train:   0%|          | 0/14 [00:00<?, ?it/s]Evaluation train:   7%|▋         | 1/14 [00:00<00:03,  3.85it/s]Evaluation train:  14%|█▍        | 2/14 [00:00<00:03,  3.99it/s]Evaluation train:  21%|██▏       | 3/14 [00:00<00:02,  4.06it/s]Evaluation train:  29%|██▊       | 4/14 [00:00<00:02,  4.12it/s]Evaluation train:  36%|███▌      | 5/14 [00:01<00:02,  4.13it/s]Evaluation train:  43%|████▎     | 6/14 [00:01<00:01,  4.15it/s]Evaluation train:  50%|█████     | 7/14 [00:01<00:01,  4.01it/s]Evaluation train:  57%|█████▋    | 8/14 [00:01<00:01,  4.07it/s]Evaluation train:  64%|██████▍   | 9/14 [00:02<00:01,  4.18it/s]Evaluation train:  71%|███████▏  | 10/14 [00:02<00:00,  4.14it/s]Evaluation train:  79%|███████▊  | 11/14 [00:02<00:00,  4.21it/s]Evaluation train:  86%|████████▌ | 12/14 [00:02<00:00,  4.14it/s]Evaluation train:  93%|█████████▎| 13/14 [00:03<00:00,  4.06it/s]Evaluation train: 100%|██████████| 14/14 [00:03<00:00,  4.09it/s]
+Evaluation vali :   0%|          | 0/3 [00:00<?, ?it/s]Evaluation vali :  33%|███▎      | 1/3 [00:00<00:00,  4.17it/s]Evaluation vali :  67%|██████▋   | 2/3 [00:00<00:00,  4.17it/s]Evaluation vali : 100%|██████████| 3/3 [00:01<00:00,  3.03it/s]
+Evaluation test :   0%|          | 0/4 [00:00<?, ?it/s]Evaluation test :  25%|██▌       | 1/4 [00:00<00:01,  2.60it/s]Evaluation test :  50%|█████     | 2/4 [00:00<00:00,  2.81it/s]Evaluation test :  75%|███████▌  | 3/4 [00:00<00:00,  3.10it/s]Evaluation test : 100%|██████████| 4/4 [00:01<00:00,  3.51it/s]
+Took 34.9126s
+╒═════════╤════════╤════════════╤═════════════╕
+│ class   │   loss │   accuracy │   hits_at_k │
+╞═════════╪════════╪════════════╪═════════════╡
+│ train   │ 3.3364 │     0.5429 │      0.7000 │
+├─────────┼────────┼────────────┼─────────────┤
+│ vali    │ 5.0654 │     0.0000 │      0.0000 │
+├─────────┼────────┼────────────┼─────────────┤
+│ test    │ 5.6576 │     0.0000 │      0.0000 │
+╘═════════╧════════╧════════════╧═════════════╛
+Last improvement of accuracy on combined happened 2 epochs ago
+
+
+Epoch   4
+Training:   0%|          | 0/14 [00:00<?, ?it/s]Training:   7%|▋         | 1/14 [00:02<00:28,  2.20s/it]Training:  14%|█▍        | 2/14 [00:04<00:27,  2.27s/it]Training:  21%|██▏       | 3/14 [00:06<00:24,  2.23s/it]Training:  29%|██▊       | 4/14 [00:08<00:22,  2.22s/it]Training:  36%|███▌      | 5/14 [00:11<00:22,  2.47s/it]Training:  43%|████▎     | 6/14 [00:14<00:20,  2.51s/it]Training:  50%|█████     | 7/14 [00:17<00:17,  2.50s/it]Training:  57%|█████▋    | 8/14 [00:19<00:14,  2.39s/it]Training:  64%|██████▍   | 9/14 [00:21<00:11,  2.32s/it]Training:  71%|███████▏  | 10/14 [00:23<00:09,  2.27s/it]Training:  79%|███████▊  | 11/14 [00:25<00:06,  2.30s/it]Training:  86%|████████▌ | 12/14 [00:28<00:04,  2.27s/it]Training:  93%|█████████▎| 13/14 [00:30<00:02,  2.36s/it]Training: 100%|██████████| 14/14 [00:33<00:00,  2.35s/it]
+Evaluation train:   0%|          | 0/14 [00:00<?, ?it/s]Evaluation train:   7%|▋         | 1/14 [00:00<00:04,  2.86it/s]Evaluation train:  14%|█▍        | 2/14 [00:00<00:03,  3.12it/s]Evaluation train:  21%|██▏       | 3/14 [00:00<00:03,  3.27it/s]Evaluation train:  29%|██▊       | 4/14 [00:01<00:03,  3.28it/s]Evaluation train:  36%|███▌      | 5/14 [00:01<00:02,  3.48it/s]Evaluation train:  43%|████▎     | 6/14 [00:01<00:02,  3.58it/s]Evaluation train:  50%|█████     | 7/14 [00:01<00:01,  3.60it/s]Evaluation train:  57%|█████▋    | 8/14 [00:02<00:01,  3.71it/s]Evaluation train:  64%|██████▍   | 9/14 [00:02<00:01,  3.91it/s]Evaluation train:  71%|███████▏  | 10/14 [00:02<00:01,  3.98it/s]Evaluation train:  79%|███████▊  | 11/14 [00:02<00:00,  4.13it/s]Evaluation train:  86%|████████▌ | 12/14 [00:03<00:00,  4.21it/s]Evaluation train:  93%|█████████▎| 13/14 [00:03<00:00,  4.21it/s]Evaluation train: 100%|██████████| 14/14 [00:03<00:00,  4.38it/s]
+Evaluation vali :   0%|          | 0/3 [00:00<?, ?it/s]Evaluation vali :  33%|███▎      | 1/3 [00:00<00:00,  4.84it/s]Evaluation vali :  67%|██████▋   | 2/3 [00:00<00:00,  5.00it/s]Evaluation vali : 100%|██████████| 3/3 [00:00<00:00,  5.48it/s]
+Evaluation test :   0%|          | 0/4 [00:00<?, ?it/s]Evaluation test :  25%|██▌       | 1/4 [00:00<00:00,  4.13it/s]Evaluation test :  50%|█████     | 2/4 [00:00<00:00,  4.19it/s]Evaluation test :  75%|███████▌  | 3/4 [00:00<00:00,  4.12it/s]Evaluation test : 100%|██████████| 4/4 [00:00<00:00,  4.32it/s]
+Took 38.4332s
+╒═════════╤════════╤════════════╤═════════════╕
+│ class   │   loss │   accuracy │   hits_at_k │
+╞═════════╪════════╪════════════╪═════════════╡
+│ train   │ 2.6065 │     0.7429 │      0.8143 │
+├─────────┼────────┼────────────┼─────────────┤
+│ vali    │ 5.4494 │     0.0000 │      0.0000 │
+├─────────┼────────┼────────────┼─────────────┤
+│ test    │ 6.2079 │     0.0000 │      0.0000 │
+╘═════════╧════════╧════════════╧═════════════╛
+Last improvement of accuracy on combined happened 3 epochs ago
+
+
+Epoch   5
+Training:   0%|          | 0/14 [00:00<?, ?it/s]Training:   7%|▋         | 1/14 [00:01<00:25,  1.97s/it]Training:  14%|█▍        | 2/14 [00:03<00:22,  1.91s/it]Training:  21%|██▏       | 3/14 [00:05<00:20,  1.89s/it]Training:  29%|██▊       | 4/14 [00:07<00:18,  1.86s/it]Training:  36%|███▌      | 5/14 [00:09<00:16,  1.83s/it]Training:  43%|████▎     | 6/14 [00:10<00:14,  1.81s/it]Training:  50%|█████     | 7/14 [00:12<00:12,  1.81s/it]Training:  57%|█████▋    | 8/14 [00:14<00:10,  1.80s/it]Training:  64%|██████▍   | 9/14 [00:16<00:09,  1.82s/it]Training:  71%|███████▏  | 10/14 [00:18<00:07,  1.81s/it]Training:  79%|███████▊  | 11/14 [00:19<00:05,  1.81s/it]Training:  86%|████████▌ | 12/14 [00:21<00:03,  1.80s/it]Training:  93%|█████████▎| 13/14 [00:23<00:01,  1.80s/it]Training: 100%|██████████| 14/14 [00:25<00:00,  1.79s/it]
+Evaluation train:   0%|          | 0/14 [00:00<?, ?it/s]Evaluation train:   7%|▋         | 1/14 [00:00<00:02,  5.11it/s]Evaluation train:  14%|█▍        | 2/14 [00:00<00:02,  5.15it/s]Evaluation train:  21%|██▏       | 3/14 [00:00<00:02,  5.19it/s]Evaluation train:  29%|██▊       | 4/14 [00:00<00:01,  5.21it/s]Evaluation train:  36%|███▌      | 5/14 [00:00<00:01,  5.06it/s]Evaluation train:  43%|████▎     | 6/14 [00:01<00:01,  5.12it/s]Evaluation train:  50%|█████     | 7/14 [00:01<00:01,  5.11it/s]Evaluation train:  57%|█████▋    | 8/14 [00:01<00:01,  5.08it/s]Evaluation train:  64%|██████▍   | 9/14 [00:01<00:00,  5.16it/s]Evaluation train:  71%|███████▏  | 10/14 [00:01<00:00,  5.07it/s]Evaluation train:  79%|███████▊  | 11/14 [00:02<00:00,  5.05it/s]Evaluation train:  86%|████████▌ | 12/14 [00:02<00:00,  5.09it/s]Evaluation train:  93%|█████████▎| 13/14 [00:02<00:00,  5.16it/s]Evaluation train: 100%|██████████| 14/14 [00:02<00:00,  5.26it/s]
+Evaluation vali :   0%|          | 0/3 [00:00<?, ?it/s]Evaluation vali :  33%|███▎      | 1/3 [00:00<00:00,  5.02it/s]Evaluation vali :  67%|██████▋   | 2/3 [00:00<00:00,  4.99it/s]Evaluation vali : 100%|██████████| 3/3 [00:00<00:00,  5.48it/s]
+Evaluation test :   0%|          | 0/4 [00:00<?, ?it/s]Evaluation test :  25%|██▌       | 1/4 [00:00<00:00,  5.45it/s]Evaluation test :  50%|█████     | 2/4 [00:00<00:00,  5.35it/s]Evaluation test :  75%|███████▌  | 3/4 [00:00<00:00,  5.10it/s]Evaluation test : 100%|██████████| 4/4 [00:00<00:00,  5.42it/s]
+Took 29.2987s
+╒═════════╤════════╤════════════╤═════════════╕
+│ class   │   loss │   accuracy │   hits_at_k │
+╞═════════╪════════╪════════════╪═════════════╡
+│ train   │ 1.8757 │     0.7571 │      0.8000 │
+├─────────┼────────┼────────────┼─────────────┤
+│ vali    │ 5.5230 │     0.0000 │      0.0000 │
+├─────────┼────────┼────────────┼─────────────┤
+│ test    │ 6.0085 │     0.0000 │      0.0000 │
+╘═════════╧════════╧════════════╧═════════════╛
+Last improvement of accuracy on combined happened 4 epochs ago
+
+
+Epoch   6
+Training:   0%|          | 0/14 [00:00<?, ?it/s]Training:   7%|▋         | 1/14 [00:02<00:28,  2.21s/it]Training:  14%|█▍        | 2/14 [00:04<00:27,  2.26s/it]Training:  21%|██▏       | 3/14 [00:06<00:25,  2.28s/it]Training:  29%|██▊       | 4/14 [00:09<00:22,  2.27s/it]Training:  36%|███▌      | 5/14 [00:11<00:21,  2.44s/it]Training:  43%|████▎     | 6/14 [00:14<00:20,  2.52s/it]Training:  50%|█████     | 7/14 [00:17<00:18,  2.62s/it]Training:  57%|█████▋    | 8/14 [00:20<00:16,  2.68s/it]Training:  64%|██████▍   | 9/14 [00:23<00:13,  2.74s/it]Training:  71%|███████▏  | 10/14 [00:26<00:11,  2.77s/it]Training:  79%|███████▊  | 11/14 [00:29<00:08,  2.84s/it]Training:  86%|████████▌ | 12/14 [00:31<00:05,  2.86s/it]Training:  93%|█████████▎| 13/14 [00:35<00:02,  2.91s/it]Training: 100%|██████████| 14/14 [00:37<00:00,  2.88s/it]
+Evaluation train:   0%|          | 0/14 [00:00<?, ?it/s]Evaluation train:   7%|▋         | 1/14 [00:00<00:04,  2.82it/s]Evaluation train:  14%|█▍        | 2/14 [00:00<00:04,  2.83it/s]Evaluation train:  21%|██▏       | 3/14 [00:01<00:03,  2.77it/s]Evaluation train:  29%|██▊       | 4/14 [00:01<00:03,  2.86it/s]Evaluation train:  36%|███▌      | 5/14 [00:01<00:03,  2.92it/s]Evaluation train:  43%|████▎     | 6/14 [00:04<00:07,  1.05it/s]Evaluation train:  50%|█████     | 7/14 [00:04<00:05,  1.37it/s]Evaluation train:  57%|█████▋    | 8/14 [00:04<00:03,  1.74it/s]Evaluation train:  64%|██████▍   | 9/14 [00:04<00:02,  2.17it/s]Evaluation train:  71%|███████▏  | 10/14 [00:04<00:01,  2.62it/s]Evaluation train:  79%|███████▊  | 11/14 [00:05<00:01,  2.98it/s]Evaluation train:  86%|████████▌ | 12/14 [00:05<00:00,  3.38it/s]Evaluation train:  93%|█████████▎| 13/14 [00:05<00:00,  3.55it/s]Evaluation train: 100%|██████████| 14/14 [00:05<00:00,  3.48it/s]
+Evaluation vali :   0%|          | 0/3 [00:00<?, ?it/s]Evaluation vali :  33%|███▎      | 1/3 [00:00<00:00,  3.18it/s]Evaluation vali :  67%|██████▋   | 2/3 [00:00<00:00,  3.32it/s]Evaluation vali : 100%|██████████| 3/3 [00:00<00:00,  3.82it/s]
+Evaluation test :   0%|          | 0/4 [00:00<?, ?it/s]Evaluation test :  25%|██▌       | 1/4 [00:00<00:00,  5.71it/s]Evaluation test :  50%|█████     | 2/4 [00:00<00:00,  5.58it/s]Evaluation test :  75%|███████▌  | 3/4 [00:00<00:00,  5.41it/s]Evaluation test : 100%|██████████| 4/4 [00:00<00:00,  5.47it/s]
+Took 47.7116s
+╒═════════╤════════╤════════════╤═════════════╕
+│ class   │   loss │   accuracy │   hits_at_k │
+╞═════════╪════════╪════════════╪═════════════╡
+│ train   │ 1.2507 │     0.7714 │      0.8000 │
+├─────────┼────────┼────────────┼─────────────┤
+│ vali    │ 5.9389 │     0.0000 │      0.0000 │
+├─────────┼────────┼────────────┼─────────────┤
+│ test    │ 6.5531 │     0.0000 │      0.0000 │
+╘═════════╧════════╧════════════╧═════════════╛
+Last improvement of accuracy on combined happened 5 epochs ago
+
+
+Epoch   7
+Training:   0%|          | 0/14 [00:00<?, ?it/s]Training:   7%|▋         | 1/14 [00:01<00:24,  1.89s/it]Training:  14%|█▍        | 2/14 [00:04<00:23,  1.96s/it]Training:  21%|██▏       | 3/14 [00:06<00:22,  2.08s/it]Training:  29%|██▊       | 4/14 [00:08<00:22,  2.22s/it]Training:  36%|███▌      | 5/14 [00:11<00:20,  2.24s/it]Training:  43%|████▎     | 6/14 [00:13<00:18,  2.34s/it]Training:  50%|█████     | 7/14 [00:16<00:17,  2.47s/it]Training:  57%|█████▋    | 8/14 [00:19<00:15,  2.62s/it]Training:  64%|██████▍   | 9/14 [00:22<00:13,  2.62s/it]Training:  71%|███████▏  | 10/14 [00:24<00:10,  2.68s/it]Training:  79%|███████▊  | 11/14 [00:27<00:08,  2.67s/it]Training:  86%|████████▌ | 12/14 [00:30<00:05,  2.71s/it]Training:  93%|█████████▎| 13/14 [00:32<00:02,  2.66s/it]Training: 100%|██████████| 14/14 [00:35<00:00,  2.58s/it]
+Evaluation train:   0%|          | 0/14 [00:00<?, ?it/s]Evaluation train:   7%|▋         | 1/14 [00:00<00:03,  3.60it/s]Evaluation train:  14%|█▍        | 2/14 [00:00<00:03,  3.55it/s]Evaluation train:  21%|██▏       | 3/14 [00:00<00:03,  3.44it/s]Evaluation train:  29%|██▊       | 4/14 [00:01<00:02,  3.48it/s]Evaluation train:  36%|███▌      | 5/14 [00:01<00:02,  3.49it/s]Evaluation train:  43%|████▎     | 6/14 [00:01<00:02,  3.63it/s]Evaluation train:  50%|█████     | 7/14 [00:01<00:01,  3.62it/s]Evaluation train:  57%|█████▋    | 8/14 [00:02<00:01,  3.52it/s]Evaluation train:  64%|██████▍   | 9/14 [00:02<00:01,  3.84it/s]Evaluation train:  71%|███████▏  | 10/14 [00:02<00:00,  4.04it/s]Evaluation train:  79%|███████▊  | 11/14 [00:02<00:00,  4.33it/s]Evaluation train:  86%|████████▌ | 12/14 [00:03<00:00,  4.58it/s]Evaluation train:  93%|█████████▎| 13/14 [00:03<00:00,  4.58it/s]Evaluation train: 100%|██████████| 14/14 [00:03<00:00,  4.24it/s]
+Evaluation vali :   0%|          | 0/3 [00:00<?, ?it/s]Evaluation vali :  33%|███▎      | 1/3 [00:00<00:00,  4.66it/s]Evaluation vali :  67%|██████▋   | 2/3 [00:00<00:00,  4.78it/s]Evaluation vali : 100%|██████████| 3/3 [00:00<00:00,  5.22it/s]
+Evaluation test :   0%|          | 0/4 [00:00<?, ?it/s]Evaluation test :  25%|██▌       | 1/4 [00:00<00:00,  5.08it/s]Evaluation test :  50%|█████     | 2/4 [00:00<00:00,  3.91it/s]Evaluation test :  75%|███████▌  | 3/4 [00:00<00:00,  3.66it/s]Evaluation test : 100%|██████████| 4/4 [00:01<00:00,  3.26it/s]
+Took 40.7896s
+╒═════════╤════════╤════════════╤═════════════╕
+│ class   │   loss │   accuracy │   hits_at_k │
+╞═════════╪════════╪════════════╪═════════════╡
+│ train   │ 0.9675 │     0.7571 │      0.8143 │
+├─────────┼────────┼────────────┼─────────────┤
+│ vali    │ 6.2894 │     0.0000 │      0.0000 │
+├─────────┼────────┼────────────┼─────────────┤
+│ test    │ 6.6329 │     0.0000 │      0.0000 │
+╘═════════╧════════╧════════════╧═════════════╛
+Last improvement of accuracy on combined happened 6 epochs ago
+
+
+Epoch   8
+Training:   0%|          | 0/14 [00:00<?, ?it/s]Training:   7%|▋         | 1/14 [00:02<00:28,  2.18s/it]Training:  14%|█▍        | 2/14 [00:05<00:28,  2.40s/it]Training:  21%|██▏       | 3/14 [00:07<00:27,  2.48s/it]Training:  29%|██▊       | 4/14 [00:10<00:25,  2.56s/it]Training:  36%|███▌      | 5/14 [00:13<00:25,  2.80s/it]Training:  43%|████▎     | 6/14 [00:19<00:28,  3.52s/it]Training:  50%|█████     | 7/14 [00:22<00:24,  3.45s/it]Training:  57%|█████▋    | 8/14 [00:25<00:20,  3.44s/it]Training:  64%|██████▍   | 9/14 [00:29<00:17,  3.56s/it]Training:  71%|███████▏  | 10/14 [00:32<00:13,  3.48s/it]Training:  79%|███████▊  | 11/14 [00:35<00:09,  3.13s/it]Training:  86%|████████▌ | 12/14 [00:37<00:05,  2.98s/it]Training:  93%|█████████▎| 13/14 [00:40<00:02,  2.99s/it]Training: 100%|██████████| 14/14 [00:44<00:00,  3.08s/it]
+Evaluation train:   0%|          | 0/14 [00:00<?, ?it/s]Evaluation train:   7%|▋         | 1/14 [00:00<00:09,  1.42it/s]Evaluation train:  14%|█▍        | 2/14 [00:00<00:06,  1.72it/s]Evaluation train:  21%|██▏       | 3/14 [00:01<00:07,  1.51it/s]Evaluation train:  29%|██▊       | 4/14 [00:02<00:05,  1.86it/s]Evaluation train:  36%|███▌      | 5/14 [00:02<00:04,  2.22it/s]Evaluation train:  43%|████▎     | 6/14 [00:02<00:03,  2.57it/s]Evaluation train:  50%|█████     | 7/14 [00:03<00:03,  2.14it/s]Evaluation train:  57%|█████▋    | 8/14 [00:03<00:03,  1.90it/s]Evaluation train:  64%|██████▍   | 9/14 [00:04<00:02,  2.26it/s]Evaluation train:  71%|███████▏  | 10/14 [00:04<00:01,  2.61it/s]Evaluation train:  79%|███████▊  | 11/14 [00:04<00:01,  2.80it/s]Evaluation train:  86%|████████▌ | 12/14 [00:04<00:00,  3.04it/s]Evaluation train:  93%|█████████▎| 13/14 [00:05<00:00,  3.19it/s]Evaluation train: 100%|██████████| 14/14 [00:05<00:00,  3.42it/s]
+Evaluation vali :   0%|          | 0/3 [00:00<?, ?it/s]Evaluation vali :  33%|███▎      | 1/3 [00:00<00:00,  3.95it/s]Evaluation vali :  67%|██████▋   | 2/3 [00:00<00:00,  3.74it/s]Evaluation vali : 100%|██████████| 3/3 [00:01<00:00,  2.88it/s]
+Evaluation test :   0%|          | 0/4 [00:00<?, ?it/s]Evaluation test :  25%|██▌       | 1/4 [00:00<00:00,  3.70it/s]Evaluation test :  50%|█████     | 2/4 [00:00<00:00,  3.36it/s]Evaluation test :  75%|███████▌  | 3/4 [00:02<00:00,  1.47it/s]Evaluation test : 100%|██████████| 4/4 [00:02<00:00,  1.43it/s]
+Took 53.6610s
+╒═════════╤════════╤════════════╤═════════════╕
+│ class   │   loss │   accuracy │   hits_at_k │
+╞═════════╪════════╪════════════╪═════════════╡
+│ train   │ 0.8043 │     0.7714 │      0.8143 │
+├─────────┼────────┼────────────┼─────────────┤
+│ vali    │ 6.7736 │     0.0000 │      0.0000 │
+├─────────┼────────┼────────────┼─────────────┤
+│ test    │ 7.1303 │     0.0000 │      0.0000 │
+╘═════════╧════════╧════════════╧═════════════╛
+Last improvement of accuracy on combined happened 7 epochs ago
+
+
+Epoch   9
+Training:   0%|          | 0/14 [00:00<?, ?it/s]Training:   7%|▋         | 1/14 [00:03<00:45,  3.47s/it]Training:  14%|█▍        | 2/14 [00:05<00:38,  3.17s/it]Training:  21%|██▏       | 3/14 [00:08<00:31,  2.90s/it]Training:  29%|██▊       | 4/14 [00:10<00:27,  2.73s/it]Training:  36%|███▌      | 5/14 [00:12<00:23,  2.59s/it]Training:  43%|████▎     | 6/14 [00:15<00:19,  2.48s/it]Training:  50%|█████     | 7/14 [00:17<00:16,  2.41s/it]Training:  57%|█████▋    | 8/14 [00:19<00:14,  2.47s/it]Training:  64%|██████▍   | 9/14 [00:22<00:12,  2.41s/it]Training:  71%|███████▏  | 10/14 [00:24<00:09,  2.36s/it]Training:  79%|███████▊  | 11/14 [00:26<00:06,  2.29s/it]Training:  86%|████████▌ | 12/14 [00:28<00:04,  2.30s/it]Training:  93%|█████████▎| 13/14 [00:31<00:02,  2.34s/it]Training: 100%|██████████| 14/14 [00:33<00:00,  2.29s/it]
+Evaluation train:   0%|          | 0/14 [00:00<?, ?it/s]Evaluation train:   7%|▋         | 1/14 [00:00<00:03,  3.78it/s]Evaluation train:  14%|█▍        | 2/14 [00:00<00:03,  3.69it/s]Evaluation train:  21%|██▏       | 3/14 [00:00<00:02,  3.77it/s]Evaluation train:  29%|██▊       | 4/14 [00:01<00:02,  3.85it/s]Evaluation train:  36%|███▌      | 5/14 [00:01<00:02,  4.06it/s]Evaluation train:  43%|████▎     | 6/14 [00:01<00:01,  4.12it/s]Evaluation train:  50%|█████     | 7/14 [00:01<00:01,  4.09it/s]Evaluation train:  57%|█████▋    | 8/14 [00:01<00:01,  4.09it/s]Evaluation train:  64%|██████▍   | 9/14 [00:02<00:01,  3.94it/s]Evaluation train:  71%|███████▏  | 10/14 [00:02<00:01,  3.88it/s]Evaluation train:  79%|███████▊  | 11/14 [00:02<00:00,  3.95it/s]Evaluation train:  86%|████████▌ | 12/14 [00:03<00:00,  3.94it/s]Evaluation train:  93%|█████████▎| 13/14 [00:03<00:00,  3.75it/s]Evaluation train: 100%|██████████| 14/14 [00:03<00:00,  3.60it/s]
+Evaluation vali :   0%|          | 0/3 [00:00<?, ?it/s]Evaluation vali :  33%|███▎      | 1/3 [00:00<00:00,  2.76it/s]Evaluation vali :  67%|██████▋   | 2/3 [00:00<00:00,  2.95it/s]Evaluation vali : 100%|██████████| 3/3 [00:00<00:00,  3.30it/s]
+Evaluation test :   0%|          | 0/4 [00:00<?, ?it/s]Evaluation test :  25%|██▌       | 1/4 [00:00<00:00,  3.33it/s]Evaluation test :  50%|█████     | 2/4 [00:00<00:00,  3.40it/s]Evaluation test :  75%|███████▌  | 3/4 [00:00<00:00,  3.58it/s]Evaluation test : 100%|██████████| 4/4 [00:01<00:00,  3.89it/s]
+Took 39.598s
+╒═════════╤════════╤════════════╤═════════════╕
+│ class   │   loss │   accuracy │   hits_at_k │
+╞═════════╪════════╪════════════╪═════════════╡
+│ train   │ 0.7041 │     0.7857 │      0.8429 │
+├─────────┼────────┼────────────┼─────────────┤
+│ vali    │ 7.2155 │     0.0000 │      0.0000 │
+├─────────┼────────┼────────────┼─────────────┤
+│ test    │ 7.3469 │     0.0000 │      0.0000 │
+╘═════════╧════════╧════════════╧═════════════╛
+Last improvement of accuracy on combined happened 8 epochs ago
+
+
+Epoch  10
+Training:   0%|          | 0/14 [00:00<?, ?it/s]Training:   7%|▋         | 1/14 [00:02<00:27,  2.08s/it]Training:  14%|█▍        | 2/14 [00:04<00:25,  2.12s/it]Training:  21%|██▏       | 3/14 [00:06<00:23,  2.18s/it]Training:  29%|██▊       | 4/14 [00:08<00:22,  2.23s/it]Training:  36%|███▌      | 5/14 [00:11<00:20,  2.25s/it]Training:  43%|████▎     | 6/14 [00:13<00:18,  2.29s/it]Training:  50%|█████     | 7/14 [00:16<00:16,  2.35s/it]Training:  57%|█████▋    | 8/14 [00:18<00:13,  2.32s/it]Training:  64%|██████▍   | 9/14 [00:20<00:11,  2.28s/it]Training:  71%|███████▏  | 10/14 [00:22<00:09,  2.28s/it]Training:  79%|███████▊  | 11/14 [00:25<00:06,  2.25s/it]Training:  86%|████████▌ | 12/14 [00:27<00:04,  2.24s/it]Training:  93%|█████████▎| 13/14 [00:29<00:02,  2.23s/it]Training: 100%|██████████| 14/14 [00:31<00:00,  2.22s/it]
+Evaluation train:   0%|          | 0/14 [00:00<?, ?it/s]Evaluation train:   7%|▋         | 1/14 [00:00<00:03,  3.68it/s]Evaluation train:  14%|█▍        | 2/14 [00:00<00:03,  3.75it/s]Evaluation train:  21%|██▏       | 3/14 [00:00<00:02,  3.80it/s]Evaluation train:  29%|██▊       | 4/14 [00:01<00:02,  3.84it/s]Evaluation train:  36%|███▌      | 5/14 [00:01<00:02,  3.85it/s]Evaluation train:  43%|████▎     | 6/14 [00:01<00:02,  3.90it/s]Evaluation train:  50%|█████     | 7/14 [00:01<00:01,  3.81it/s]Evaluation train:  57%|█████▋    | 8/14 [00:02<00:01,  3.84it/s]Evaluation train:  64%|██████▍   | 9/14 [00:02<00:01,  3.81it/s]Evaluation train:  71%|███████▏  | 10/14 [00:02<00:01,  3.87it/s]Evaluation train:  79%|███████▊  | 11/14 [00:02<00:00,  3.91it/s]Evaluation train:  86%|████████▌ | 12/14 [00:03<00:00,  3.86it/s]Evaluation train:  93%|█████████▎| 13/14 [00:03<00:00,  3.78it/s]Evaluation train: 100%|██████████| 14/14 [00:03<00:00,  3.77it/s]
+Evaluation vali :   0%|          | 0/3 [00:00<?, ?it/s]Evaluation vali :  33%|███▎      | 1/3 [00:00<00:00,  4.01it/s]Evaluation vali :  67%|██████▋   | 2/3 [00:00<00:00,  3.88it/s]Evaluation vali : 100%|██████████| 3/3 [00:00<00:00,  4.33it/s]
+Evaluation test :   0%|          | 0/4 [00:00<?, ?it/s]Evaluation test :  25%|██▌       | 1/4 [00:00<00:00,  3.71it/s]Evaluation test :  50%|█████     | 2/4 [00:00<00:00,  3.70it/s]Evaluation test :  75%|███████▌  | 3/4 [00:00<00:00,  3.77it/s]Evaluation test : 100%|██████████| 4/4 [00:00<00:00,  4.06it/s]
+Took 37.4184s
+╒═════════╤════════╤════════════╤═════════════╕
+│ class   │   loss │   accuracy │   hits_at_k │
+╞═════════╪════════╪════════════╪═════════════╡
+│ train   │ 0.7520 │     0.7571 │      0.8000 │
+├─────────┼────────┼────────────┼─────────────┤
+│ vali    │ 6.9933 │     0.0000 │      0.0000 │
+├─────────┼────────┼────────────┼─────────────┤
+│ test    │ 7.0429 │     0.0000 │      0.0000 │
+╘═════════╧════════╧════════════╧═════════════╛
+Last improvement of accuracy on combined happened 9 epochs ago
+
+
+Epoch  11
+Training:   0%|          | 0/14 [00:00<?, ?it/s]Training:   7%|▋         | 1/14 [00:02<00:28,  2.19s/it]Training:  14%|█▍        | 2/14 [00:04<00:26,  2.20s/it]Training:  21%|██▏       | 3/14 [00:06<00:24,  2.21s/it]Training:  29%|██▊       | 4/14 [00:08<00:22,  2.21s/it]Training:  36%|███▌      | 5/14 [00:11<00:19,  2.20s/it]Training:  43%|████▎     | 6/14 [00:13<00:17,  2.21s/it]Training:  50%|█████     | 7/14 [00:15<00:15,  2.22s/it]Training:  57%|█████▋    | 8/14 [00:17<00:13,  2.22s/it]Training:  64%|██████▍   | 9/14 [00:19<00:11,  2.23s/it]Training:  71%|███████▏  | 10/14 [00:22<00:08,  2.20s/it]Training:  79%|███████▊  | 11/14 [00:24<00:06,  2.23s/it]Training:  86%|████████▌ | 12/14 [00:26<00:04,  2.24s/it]Training:  93%|█████████▎| 13/14 [00:28<00:02,  2.24s/it]Training: 100%|██████████| 14/14 [00:31<00:00,  2.25s/it]
+Evaluation train:   0%|          | 0/14 [00:00<?, ?it/s]Evaluation train:   7%|▋         | 1/14 [00:00<00:03,  3.72it/s]Evaluation train:  14%|█▍        | 2/14 [00:00<00:03,  3.83it/s]Evaluation train:  21%|██▏       | 3/14 [00:00<00:02,  3.71it/s]Evaluation train:  29%|██▊       | 4/14 [00:01<00:02,  3.76it/s]Evaluation train:  36%|███▌      | 5/14 [00:01<00:02,  3.84it/s]Evaluation train:  43%|████▎     | 6/14 [00:01<00:02,  3.78it/s]Evaluation train:  50%|█████     | 7/14 [00:01<00:01,  3.86it/s]Evaluation train:  57%|█████▋    | 8/14 [00:02<00:01,  3.81it/s]Evaluation train:  64%|██████▍   | 9/14 [00:02<00:01,  3.87it/s]Evaluation train:  71%|███████▏  | 10/14 [00:02<00:01,  3.89it/s]Evaluation train:  79%|███████▊  | 11/14 [00:02<00:00,  3.89it/s]Evaluation train:  86%|████████▌ | 12/14 [00:03<00:00,  3.90it/s]Evaluation train:  93%|█████████▎| 13/14 [00:03<00:00,  3.96it/s]Evaluation train: 100%|██████████| 14/14 [00:03<00:00,  3.89it/s]
+Evaluation vali :   0%|          | 0/3 [00:00<?, ?it/s]Evaluation vali :  33%|███▎      | 1/3 [00:00<00:00,  3.86it/s]Evaluation vali :  67%|██████▋   | 2/3 [00:00<00:00,  3.88it/s]Evaluation vali : 100%|██████████| 3/3 [00:00<00:00,  4.24it/s]
+Evaluation test :   0%|          | 0/4 [00:00<?, ?it/s]Evaluation test :  25%|██▌       | 1/4 [00:00<00:00,  4.19it/s]Evaluation test :  50%|█████     | 2/4 [00:00<00:00,  4.16it/s]Evaluation test :  75%|███████▌  | 3/4 [00:00<00:00,  4.08it/s]Evaluation test : 100%|██████████| 4/4 [00:00<00:00,  4.25it/s]
+Took 36.4715s
+╒═════════╤════════╤════════════╤═════════════╕
+│ class   │   loss │   accuracy │   hits_at_k │
+╞═════════╪════════╪════════════╪═════════════╡
+│ train   │ 0.7596 │     0.7714 │      0.8429 │
+├─────────┼────────┼────────────┼─────────────┤
+│ vali    │ 7.3461 │     0.0000 │      0.0000 │
+├─────────┼────────┼────────────┼─────────────┤
+│ test    │ 7.3126 │     0.0556 │      0.0556 │
+╘═════════╧════════╧════════════╧═════════════╛
+Last improvement of accuracy on combined happened 10 epochs ago
+
+EARLY STOPPING due to lack of validation improvement, it has been 10 epochs since last validation accuracy improvement
+
+Best validation model epoch: 1
+Best validation model accuracy on validation set combined: 0.0
+Best validation model accuracy on test set combined: 0.0
+
+Finished: experiment_run
+Saved to: results/experiment_run_0
