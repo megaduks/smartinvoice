@@ -1,6 +1,6 @@
 import unittest
 import spacy
-from ..matchers import NIPmatcher
+from ..matchers import NIPmatcher, date_tagger
 
 
 class MyTestCase(unittest.TestCase):
@@ -36,6 +36,22 @@ class MyTestCase(unittest.TestCase):
     def test_two_NIPs(self):
         doc = self.nlp('NIP sprzedawcy 123-45-67-890 i NIP klienta 0987654321')
         self.assertTrue(NIPmatcher(doc).count('<NIP>') == 2)
+
+    def test_simple_date_with_dashes(self):
+        doc = self.nlp('data sprzedaży 12-10-2017')
+        self.assertTrue('<DATE>' in date_tagger(doc).text)
+
+    def test_simple_date_with_dots(self):
+        doc = self.nlp('data sprzedaży 1.1.2020')
+        self.assertTrue('<DATE>' in date_tagger(doc).text)
+
+    def test_simple_date_with_spaces(self):
+        doc = self.nlp('data sprzedaży 31 12 2019')
+        self.assertTrue('<DATE>' in date_tagger(doc).text)
+
+    def test_simple_date_reversed(self):
+        doc = self.nlp('data sprzedaży 2020 1 1')
+        self.assertTrue('<DATE>' in date_tagger(doc).text)
 
 
 if __name__ == '__main__':
