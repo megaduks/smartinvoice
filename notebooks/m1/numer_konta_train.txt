@@ -1,0 +1,19 @@
+╒═════════╤════════╤════════════╤═════════════╕
+│ class   │   loss │   accuracy │   hits_at_k │
+╞═════════╪════════╪════════════╪═════════════╡
+│ train   │ 0.5323 │     0.8143 │      0.8857 │
+├─────────┼────────┼────────────┼─────────────┤
+│ vali    │ 7.1455 │     0.2500 │      0.2500 │
+├─────────┼────────┼────────────┼─────────────┤
+│ test    │ 6.7098 │     0.1111 │      0.3333 │
+╘═════════╧════════╧════════════╧═════════════╛
+Last improvement of accuracy on combined happened 10 epochs ago
+
+EARLY STOPPING due to lack of validation improvement, it has been 10 epochs since last validation accuracy improvement
+
+Best validation model epoch: 4
+Best validation model accuracy on validation set combined: 0.25
+Best validation model accuracy on test set combined: 0.16666666666666666
+
+Finished: experiment_run
+Saved to: results/experiment_run

@@ -1,0 +1,20 @@
+
+input_features:
+    -
+        name: doc_txt
+        type: text
+        encoder: cnnrnn
+        cell_type: lstm
+        level: char
+
+output_features:
+    -
+        name: class
+        type: category
+            
+training:
+    learning_rate: 0.001
+    early_stop: 10
+    batch_size: 5
+    learning_rate_warmup_epochs: 3
+    validation_measure: accuracy
