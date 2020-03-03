@@ -11,9 +11,9 @@ import os
 from tqdm import tqdm
 from scipy.ndimage import interpolation as inter
 import cv2
+from typing import List
 
-
-def correct_skew(image, delta=1, limit=5):
+def correct_skew(image: np.ndarray, delta=1, limit=5) -> np.ndarray:
     def determine_score(arr, angle):
         data = inter.rotate(arr, angle, reshape=False, order=0)
         histogram = np.sum(data, axis=1)
@@ -39,7 +39,7 @@ def correct_skew(image, delta=1, limit=5):
     return rotated
 
 
-def group_boxes(boxes):
+def group_boxes(boxes: List[np.ndarray]) -> List[np.ndarray]:
     # sorting bounding boxes into lines of text, returns a list of a list of np.arrays
     # first, sorting from top to bottom
     boxes = sorted(boxes, key=lambda r: r[1])
@@ -96,7 +96,7 @@ def group_boxes(boxes):
     return groupedBoxes
 
 
-def resize_img(orgH : int, width : int):
+def resize_img(orgH : int, width : int) _:
     #TODO: resize horizontal images
     pass
 
@@ -159,7 +159,7 @@ def decode_predictions(scores, geometry):
     return (rectangles, confidences)
 
 
-def clean_output(text):
+def clean_output(text : str) -> str:
     # Remove non-ASCII characters from the input string
     text = "".join([c if ord(c) < 128 else "" for c in text]).strip()
     return text
@@ -284,7 +284,7 @@ for pathToImg in tqdm(args['image']):
     if args['display']:
         output = orig.copy()
         for ((startX, startY, endX, endY), text) in results:
-
+tp
             # using OpenCV, then draw the text and a bounding box surrounding
             # the text region of the input image
 
