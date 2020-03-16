@@ -96,7 +96,7 @@ def group_boxes(boxes: List[np.ndarray]) -> List[np.ndarray]:
     return groupedBoxes
 
 
-def resize_img(orgH : int, width : int) _:
+def resize_img(orgH : int, width : int):
     #TODO: resize horizontal images
     pass
 
@@ -284,7 +284,6 @@ for pathToImg in tqdm(args['image']):
     if args['display']:
         output = orig.copy()
         for ((startX, startY, endX, endY), text) in results:
-tp
             # using OpenCV, then draw the text and a bounding box surrounding
             # the text region of the input image
 
