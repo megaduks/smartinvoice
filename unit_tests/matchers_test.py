@@ -1,19 +1,19 @@
 import unittest
 import spacy
 
-from spacy.lang.pl import Polish
-
-from ..matchers import match_NIP
+from ..matchers import NIPMatcher
 
 
 class MatchersTestCase(unittest.TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        cls.nlp = Polish()
+    def __init__(self,  *args, **kwargs):
+        super(MatchersTestCase, self).__init__(*args, **kwargs)
+        self.nlp = spacy.load('en_core_web_sm')
+        self.nip_matcher = NIPMatcher(self.nlp)
+        self.nlp.add_pipe(self.nip_matcher, before='ner')
 
     def test_NIP(self):
-        _tests = [
+        test_strings = [
             'NIP: 1234567890',
             'NIP: PL 1234567890',
             'NIP: PL1234567890',
@@ -33,14 +33,9 @@ class MatchersTestCase(unittest.TestCase):
             'NIP: 123 45 67 890PL',
         ]
 
-        for test in _tests:
-            _doc = self.nlp(test)
-            ent_labels = [
-                self.nlp.vocab.strings[ent_id]
-                for ent_id, start, end
-                in match_NIP()(_doc)
-            ]
-            self.assertTrue('NIP' in ent_labels)
+        for test_string in test_strings:
+            doc = self.nlp(test_string)
+            self.assertTrue('NIP' in [e.label_ for e in doc.ents])
 
 
 if __name__ == '__main__':
