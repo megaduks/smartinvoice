@@ -2,12 +2,29 @@ from spacy.matcher import Matcher
 from spacy.tokens import Doc, Span
 
 
-class NIPMatcher():
+class InvoiceMatcher():
+    """Generic class which is extended with particular patterns and labels"""
+
+    def __init__(self, nlp, label):
+        """Creates a new NIP matcher using a shared vocabulary object"""
+        self.matcher = Matcher(nlp.vocab)
+        self.label = label
+
+    def __call__(self, doc: Doc) -> Doc:
+        matches = self.matcher(doc)
+        spans = []
+        for match_id, start, end in matches:
+            spans.append(Span(doc, start, end, label=self.label))
+        doc.ents = list(doc.ents) + spans
+        return doc
+
+
+class NIPMatcher(InvoiceMatcher):
     """Extracts matched NIP instances and adds them as document entities with the label NIP"""
 
     def __init__(self, nlp):
         """Creates a new NIP matcher using a shared vocabulary object"""
-        self.matcher = Matcher(nlp.vocab)
+        super(NIPMatcher, self).__init__(nlp, label='NIP')
         patterns = [
             # an optional 2-letter country code followed by 10 consecutive digits
             [{'TEXT': {'REGEX': '([a-zA-Z][a-zA-Z])?\d{10}'}}],
@@ -22,23 +39,15 @@ class NIPMatcher():
             # 3-2-2-3 digit pattern (either dashes or spaces) followed by an optional 2-letter country code
             [{'TEXT': {'REGEX': '\d{3}(-|\s)\d{2}(-|\s)\d{2}(-|\s)\d{3}([a-zA-Z][a-zA-Z])?'}}]
         ]
-        self.matcher.add('NIP', None, *patterns)
-
-    def __call__(self, doc: Doc) -> Doc:
-        matches = self.matcher(doc)
-        spans = []
-        for match_id, start, end in matches:
-            spans.append(Span(doc, start, end, label="NIP"))
-        doc.ents = list(doc.ents) + spans
-        return doc
+        self.matcher.add(self.label, None, *patterns)
 
 
-class BankNumberMatcher():
+class BankNumberMatcher(InvoiceMatcher):
     """Extracts matched bank account numbers and adds them as document entities with the label BANK_ACCOUNT_NO"""
 
     def __init__(self, nlp):
         """Creates a new bank number account matcher using a shared vocabulary object"""
-        self.matcher = Matcher(nlp.vocab)
+        super(BankNumberMatcher, self).__init__(nlp, label='BANK_ACCOUNT_NO')
         patterns = [
             # an optional 2-letter country code followed by 26 consecutive digits
             [{'TEXT': {'REGEX': '([a-zA-Z][a-zA-Z])?\d{26}'}}],
@@ -53,12 +62,4 @@ class BankNumberMatcher():
             # 2-24 digit pattern (either dashes or spaces) followed by an optional 2-letter country code
             [{'TEXT': {'REGEX': '\d{2}(-|\s)\d{24}([\sa-zA-Z][a-zA-Z])?'}}]
         ]
-        self.matcher.add('BANK_ACCOUNT_NO', None, *patterns)
-
-    def __call__(self, doc: Doc) -> Doc:
-        matches = self.matcher(doc)
-        spans = []
-        for match_id, start, end in matches:
-            spans.append(Span(doc, start, end, label="BANK_ACCOUNT_NO"))
-        doc.ents = list(doc.ents) + spans
-        return doc
+        self.matcher.add(self.label, None, *patterns)
