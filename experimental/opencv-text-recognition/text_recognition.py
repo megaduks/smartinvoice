@@ -11,9 +11,15 @@ import os
 from tqdm import tqdm
 from scipy.ndimage import interpolation as inter
 import cv2
+from typing import List
 
 
-def correct_skew(image, delta=1, limit=5):
+def correct_skew(image: np.ndarray, delta=0.05, limit=5) -> np.ndarray:
+
+    '''corrects skew in images using the Projection Profile method, limited in maximum angle of skew,
+    delta determines step between angles checked'''
+
+
     def determine_score(arr, angle):
         data = inter.rotate(arr, angle, reshape=False, order=0)
         histogram = np.sum(data, axis=1)
@@ -39,7 +45,7 @@ def correct_skew(image, delta=1, limit=5):
     return rotated
 
 
-def group_boxes(boxes):
+def group_boxes(boxes: List[np.ndarray]) -> List[np.ndarray]:
     # sorting bounding boxes into lines of text, returns a list of a list of np.arrays
     # first, sorting from top to bottom
     boxes = sorted(boxes, key=lambda r: r[1])
@@ -156,10 +162,10 @@ def decode_predictions(scores, geometry):
             confidences.append(scoresData[x])
 
     # return a tuple of the bounding boxes and associated confidences
-    return (rectangles, confidences)
+    return rectangles, confidences
 
 
-def clean_output(text):
+def clean_output(text : str) -> str:
     # Remove non-ASCII characters from the input string
     text = "".join([c if ord(c) < 128 else "" for c in text]).strip()
     return text
@@ -204,22 +210,22 @@ for pathToImg in tqdm(args['image']):
     image = correct_skew(image)
 
     orig = image.copy()
-    (origH, origW) = image.shape[:2]
+    (origImgHeight, origImgWidth) = image.shape[:2]
 
     # set the new width and height and then determine the ratio in change
     # for both the width and height
-    (newW, newH) = (args["width"], args["height"])
-    ratioW = origW / float(newW)
-    ratioH = origH / float(newH)
+    (newImgWidth, newImgHeight) = (args["width"], args["height"])
+    ratioW = origImgWidth / float(newImgWidth)
+    ratioH = origImgHeight / float(newImgHeight)
 
     # resize the image and grab the new image dimensions
-    image = cv2.resize(image, (newW, newH))
+    image = cv2.resize(image, (newImgWidth, newImgHeight))
 
-    (H, W) = image.shape[:2]
+    (imgHeight, imageWidth) = image.shape[:2]
 
     # construct a blob from the image and then perform a forward pass of
     # the model to obtain the two output layer sets
-    blob = cv2.dnn.blobFromImage(image, 1.0, (W, H),
+    blob = cv2.dnn.blobFromImage(image, 1.0, (imageWidth, imgHeight),
                                  (123.68, 116.78, 103.94), swapRB=True, crop=False)
     net.setInput(blob)
     (scores, geometry) = net.forward(layerNames)
@@ -250,8 +256,8 @@ for pathToImg in tqdm(args['image']):
         # apply padding to each side of the bounding box, respectively
         startX = max(0, startX - dX)
         startY = max(0, startY - dY)
-        endX = min(origW, endX + (dX * 2))
-        endY = min(origH, endY + (dY * 2))
+        endX = min(origImgWidth, endX + (dX * 2))
+        endY = min(origImgHeight, endY + (dY * 2))
 
         # extract the actual padded ROI
         roi = orig[startY:endY, startX:endX]
@@ -284,7 +290,6 @@ for pathToImg in tqdm(args['image']):
     if args['display']:
         output = orig.copy()
         for ((startX, startY, endX, endY), text) in results:
-
             # using OpenCV, then draw the text and a bounding box surrounding
             # the text region of the input image
 
