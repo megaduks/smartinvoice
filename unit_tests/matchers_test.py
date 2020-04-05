@@ -1,7 +1,7 @@
 import unittest
 import spacy
 
-from ..matchers import NIPMatcher, BankNumberMatcher, REGONMatcher
+from ..matchers import NIPMatcher, BankNumberMatcher, REGONMatcher, MoneyMatcher
 
 
 class MatchersTestCase(unittest.TestCase):
@@ -92,6 +92,30 @@ class MatchersTestCase(unittest.TestCase):
         nlp = spacy.load('en_core_web_sm')
         matcher = REGONMatcher(nlp)
         nlp.add_pipe(matcher, before='ner')
+
+        for doc in nlp.pipe(positive_test_strings):
+            self.assertTrue(matcher.label in [e.label_ for e in doc.ents])
+
+        for doc in nlp.pipe(negative_test_strings):
+            self.assertFalse(matcher.label in [e.label_ for e in doc.ents])
+
+    def test_money(self):
+        positive_test_strings = [
+            'kwota brutto 123,45 zł',
+            'kwota do zapłaty 123,90 zł',
+            'pozostało do rozliczenia 239,89 PLN',
+            #'kwota nierozliczona 12.34 zl'             #TODO: decimal dot is not recognized
+        ]
+
+        negative_test_strings = [
+            'termin zapłaty 14 dni',
+            'zakupiono 18 szt.',
+            'jabłka 12 kg',
+        ]
+
+        nlp = spacy.load('pl_model')
+        matcher = MoneyMatcher(nlp)
+        nlp.add_pipe(matcher, after='ner')
 
         for doc in nlp.pipe(positive_test_strings):
             self.assertTrue(matcher.label in [e.label_ for e in doc.ents])

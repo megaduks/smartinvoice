@@ -138,3 +138,23 @@ class REGONMatcher(InvoiceMatcher):
             ],
         ]
         self.matcher.add(self.label, None, *patterns)
+
+
+class MoneyMatcher(InvoiceMatcher):
+    """Extracts matched monetary amounts expressed in Polish zloty and adds them as entites with the label PLN"""
+
+    def __init__(self, nlp):
+        """Creates a new money matcher for Polish zloty usign a shared vocabulary object"""
+        super(MoneyMatcher, self).__init__(nlp, label='PLN')
+        patterns = [
+            [
+                {'POS': 'NUM'}, {'LOWER': 'zł'}
+            ],
+            [
+                {'POS': 'NUM'}, {'LOWER': 'zl'}
+            ],
+            [
+                {'POS': 'NUM'}, {'LOWER': 'pln'}
+            ],
+        ]
+        self.matcher.add(self.label, None, *patterns)
