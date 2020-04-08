@@ -1,7 +1,7 @@
 import unittest
 import spacy
 
-from ..matchers import NIPMatcher, BankNumberMatcher, REGONMatcher, MoneyMatcher
+from matchers import NIPMatcher, BankNumberMatcher, REGONMatcher, MoneyMatcher
 
 
 class MatchersTestCase(unittest.TestCase):
