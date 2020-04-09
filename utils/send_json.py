@@ -1,13 +1,16 @@
 import requests
+import os
 from typing import Dict
+from dotenv import load_dotenv
 
 
 def send(data: Dict, job_id: str, file_id: str) -> object:
-    # Takes in a dictionary, appends job and file id and  converts into json then sends to url.
-    # Returns return code from the site in form of request object.
-
-    url = "https://api-smart-invoice-dev.b-mind.pl/api/v1/webhook/ml/send"
-    headers = {"X-ML-Signature": "QpachX9AAhKD8CB3USMk5nrMee8QvdLvYLGdhFdDpAr2vyzkK5t3q3T9wbxstMXG"}
+    # Takes in a dictionary, appends job and file id and  converts into json and sends to url.
+    # Returns return code from the site.
+    load_dotenv()
+    url = os.getenv("UPLOAD_URL")
+    signature = os.getenv("ML_SIGNATURE")
+    headers = {"X-ML-Signature": signature}
 
     data['job_id'] = job_id
     data['file_id'] = file_id
