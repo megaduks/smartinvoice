@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 import os
 
-from matchers import NIPMatcher, BankAccountMatcher
+from matchers import NIPMatcher, BankAccountMatcher, REGONMatcher
 
 load_dotenv()
 
@@ -14,5 +14,6 @@ RABBITMQ_SERVER = os.getenv("RABBITMQ_SERVER")
 
 NER_MATCHERS = {
     'nip_matcher': NIPMatcher,
-    'bank_account_matcher': BankAccountMatcher
+    'bank_account_matcher': BankAccountMatcher,
+    'regon_matcher': REGONMatcher,
 }

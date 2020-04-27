@@ -7,7 +7,7 @@ import pandas as pd
 
 from glob import glob
 
-from matchers import NIPMatcher
+from matchers import NIPMatcher, BankAccountMatcher, REGONMatcher
 from typing import List
 from spacy.tokens import Doc
 from spacy.language import Model
@@ -118,9 +118,9 @@ if __name__ == '__main__':
 
     plac.call(main)
 
-    model_path = Path('models/nip_model/')
+    model_path = Path('models/regon_model/')
     nlp = spacy.load(model_path)
-    matcher = NIPMatcher(nlp)
+    matcher = REGONMatcher(nlp)
     nlp.add_pipe(matcher, before='ner')
 
     input_dir = Path('data/ocr_raw_3/')
