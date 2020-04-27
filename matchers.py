@@ -70,51 +70,51 @@ class NIPMatcher(InvoiceMatcher):
         self.matcher.add(self.label, None, *patterns)
 
 
-class BankNumberMatcher(InvoiceMatcher):
+class BankAccountMatcher(InvoiceMatcher):
     """Extracts matched bank account numbers and adds them as document entities with the label BANK_ACCOUNT_NO"""
 
     def __init__(self, nlp):
         """Creates a new bank number account matcher using a shared vocabulary object"""
-        super(BankNumberMatcher, self).__init__(nlp, label='BANK_ACCOUNT_NO')
+        super(BankAccountMatcher, self).__init__(nlp, label='BANK_ACCOUNT_NO')
+
+        # TODO: allow for PL to be glued to the first/last digit of the account number
+        # TODO: fix the colon as the separator, now "konto:1234 1234 1234 ..." will not be matched
+
         patterns = [
             # 26 consecutive digits
             [
-                {'TEXT': {'REGEX': '\d{26}'}}
+                {'TEXT': 'PL', 'OP': '?'},
+                {'IS_DIGIT': True, 'LENGTH': {"==": 26}},
             ],
             # 24 digit format
             [
-                {'TEXT': {'REGEX': '\d{24}'}},
+                {'TEXT': 'PL', 'OP': '?'},
+                {'IS_DIGIT': True, 'LENGTH': {"==": 24}},
             ],
             # 2-24 digit format
             [
-                {'TEXT': {'REGEX': '\d{2}'}},
+                {'TEXT': 'PL', 'OP': '?'},
+                {'IS_DIGIT': True, 'LENGTH': {"==": 2}},
                 {'TEXT': '-', 'OP': '?'},
-                {'TEXT': {'REGEX': '\d{24}'}},
+                {'IS_DIGIT': True, 'LENGTH': {"==": 24}},
             ],
-            # 4 4 4 4 4 4 digit format
+            # 4 4 4 4 4 4 digit format and 4-4-4-4-4-4 digit format
             [
-                {'TEXT': {'REGEX': '\d{4}'}},
-                {'TEXT': {'REGEX': '\d{4}'}},
-                {'TEXT': {'REGEX': '\d{4}'}},
-                {'TEXT': {'REGEX': '\d{4}'}},
-                {'TEXT': {'REGEX': '\d{4}'}},
-                {'TEXT': {'REGEX': '\d{4}'}},
+                {'TEXT': 'PL', 'OP': '?'},
+                {'IS_DIGIT': True, 'LENGTH': {"==": 2}, 'OP': '?'},
+                {'TEXT': '-', 'OP': '?'},
+                {'IS_DIGIT': True, 'LENGTH': {"==": 4}},
+                {'TEXT': '-', 'OP': '?'},
+                {'IS_DIGIT': True, 'LENGTH': {"==": 4}},
+                {'TEXT': '-', 'OP': '?'},
+                {'IS_DIGIT': True, 'LENGTH': {"==": 4}},
+                {'TEXT': '-', 'OP': '?'},
+                {'IS_DIGIT': True, 'LENGTH': {"==": 4}},
+                {'TEXT': '-', 'OP': '?'},
+                {'IS_DIGIT': True, 'LENGTH': {"==": 4}},
+                {'TEXT': '-', 'OP': '?'},
+                {'IS_DIGIT': True, 'LENGTH': {"==": 4}},
             ],
-            # 4-4-4-4-4-4 digit format
-            [
-                {'TEXT': {'REGEX': '\d{4}'}},
-                {'TEXT': '-'},
-                {'TEXT': {'REGEX': '\d{4}'}},
-                {'TEXT': '-'},
-                {'TEXT': {'REGEX': '\d{4}'}},
-                {'TEXT': '-'},
-                {'TEXT': {'REGEX': '\d{4}'}},
-                {'TEXT': '-'},
-                {'TEXT': {'REGEX': '\d{4}'}},
-                {'TEXT': '-'},
-                {'TEXT': {'REGEX': '\d{4}'}},
-            ],
-
         ]
         self.matcher.add(self.label, None, *patterns)
 

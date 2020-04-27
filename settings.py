@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 import os
 
-from matchers import NIPMatcher
+from matchers import NIPMatcher, BankAccountMatcher
 
 load_dotenv()
 
@@ -13,5 +13,6 @@ RABBITMQ_PASSWORD = os.getenv("RABBITMQ_PASSWORD")
 RABBITMQ_SERVER = os.getenv("RABBITMQ_SERVER")
 
 NER_MATCHERS = {
-    'NIP_matcher': NIPMatcher
+    'nip_matcher': NIPMatcher,
+    'bank_account_matcher': BankAccountMatcher
 }

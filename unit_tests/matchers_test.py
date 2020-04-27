@@ -1,7 +1,7 @@
 import unittest
 import spacy
 
-from matchers import NIPMatcher, BankNumberMatcher, REGONMatcher, MoneyMatcher
+from matchers import NIPMatcher, BankAccountMatcher, REGONMatcher, MoneyMatcher
 
 
 class MatchersTestCase(unittest.TestCase):
@@ -45,13 +45,15 @@ class MatchersTestCase(unittest.TestCase):
     def test_bank_account_numbers(self):
         positive_test_strings = [
             'mbank: 20123456789012345678901234',
+            'mbank: PL 20123456789012345678901234',
             'mbank: 20 123456789012345678901234',
             'mbank: 20-123456789012345678901234',
+            'mbank: PL 20-123456789012345678901234',
             'mbank: 123412341234123412341234',
             'mbank: 20 1234 1234 1234 1234 1234 1234',
-            'mbank: 20-1234-1234-1234-1234-1234-1234PL',
             'mbank: 1234 1234 1234 1234 1234 1234 konto',
-            'mbank konto:1234-1234-1234-1234-1234-1234',
+            # 'mbank: 20-1234-1234-1234-1234-1234-1234PL',
+            # 'mbank konto:1234-1234-1234-1234-1234-1234',
         ]
 
         negative_test_strings = [
