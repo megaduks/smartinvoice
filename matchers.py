@@ -34,45 +34,38 @@ class NIPMatcher(InvoiceMatcher):
     def __init__(self, nlp):
         """Creates a new NIP matcher using a shared vocabulary object"""
         super(NIPMatcher, self).__init__(nlp, label='NIP')
+
+        # TODO: add matching expressions for PLxxxxxxxxxx, PLxxx xxx xx xx, etc.
+        # TODO: add recognition of KRS numbers (identical format as NIP)
+
         patterns = [
             # 10 consecutive digits
             [
-                {'TEXT': {'REGEX': '\d{10}'}}
+                {'TEXT': 'PL', 'OP': '?'},
+                {'IS_DIGIT': True, 'LENGTH': {"==": 10}},
             ],
-            # 3 3 2 2 digit format
+            # 3 3 2 2 or 3-3-2-2 pattern
             [
-                {'TEXT': {'REGEX': '\d{3}'}},
-                {'TEXT': {'REGEX': '\d{3}'}},
-                {'TEXT': {'REGEX': '\d{2}'}},
-                {'TEXT': {'REGEX': '\d{2}'}},
+                {'TEXT': 'PL', 'OP': '?'},
+                {'IS_DIGIT': True, 'SHAPE': 'ddd'},
+                {'IS_PUNCT': True, 'OP': '?'},
+                {'IS_DIGIT': True, 'SHAPE': 'ddd'},
+                {'IS_PUNCT': True, 'OP': '?'},
+                {'IS_DIGIT': True, 'SHAPE': 'dd'},
+                {'IS_PUNCT': True, 'OP': '?'},
+                {'IS_DIGIT': True, 'SHAPE': 'dd'},
             ],
-            # 3-3-2-2 digit format
+                # 3 2 2 3 or 3-2-2-3 pattern
             [
-                {'TEXT': {'REGEX': '\d{3}'}},
-                {'TEXT': '-'},
-                {'TEXT': {'REGEX': '\d{3}'}},
-                {'TEXT': '-'},
-                {'TEXT': {'REGEX': '\d{2}'}},
-                {'TEXT': '-'},
-                {'TEXT': {'REGEX': '\d{2}'}},
-            ],
-            # 3 2 2 3 digit format
-            [
-                {'TEXT': {'REGEX': '\d{3}'}},
-                {'TEXT': {'REGEX': '\d{2}'}},
-                {'TEXT': {'REGEX': '\d{2}'}},
-                {'TEXT': {'REGEX': '\d{3}'}},
-            ],
-            # 3-2-2-3 digit format
-            [
-                {'TEXT': {'REGEX': '\d{3}'}},
-                {'TEXT': '-'},
-                {'TEXT': {'REGEX': '\d{2}'}},
-                {'TEXT': '-'},
-                {'TEXT': {'REGEX': '\d{2}'}},
-                {'TEXT': '-'},
-                {'TEXT': {'REGEX': '\d{3}'}},
-            ],
+                {'TEXT': 'PL', 'OP': '?'},
+                {'IS_DIGIT': True, 'SHAPE': 'ddd'},
+                {'IS_PUNCT': True, 'OP': '?'},
+                {'IS_DIGIT': True, 'SHAPE': 'dd'},
+                {'IS_PUNCT': True, 'OP': '?'},
+                {'IS_DIGIT': True, 'SHAPE': 'dd'},
+                {'IS_PUNCT': True, 'OP': '?'},
+                {'IS_DIGIT': True, 'SHAPE': 'ddd'},
+            ]
         ]
         self.matcher.add(self.label, None, *patterns)
 
