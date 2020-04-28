@@ -1,7 +1,7 @@
 import unittest
 import spacy
 
-from matchers import NIPMatcher, BankNumberMatcher, REGONMatcher, MoneyMatcher
+from matchers import NIPMatcher, BankAccountMatcher, REGONMatcher, MoneyMatcher
 
 
 class MatchersTestCase(unittest.TestCase):
@@ -11,32 +11,25 @@ class MatchersTestCase(unittest.TestCase):
 
     def test_NIP(self):
         positive_test_strings = [
-            'NIP: 1234567890',
-            'NIP:1234567890',
-            'NIP: PL 1234567890',
-            'NIP: PL1234567890',
-            'NIP: 1234567890 PL',
-            'NIP: 1234567890PL',
-            'NIP: 123 456 78 90',
-            'NIP: 123-456-78-90',
-            'NIP: PL 123 456 78 90',
-            'NIP: PL123-456-78-90',
-            'NIP: 123 456 78 90 PL',
-            'NIP: 123-456-78-90PL',
-            'NIP: 123 45 67 890',
-            'NIP: 123-45-67-890',
-            'NIP: PL 123 45 67 890',
-            'NIP: PL123-45-67-890',
-            'NIP: 123-45-67-890 PL',
-            'NIP: 123 45 67 890PL',
+            '1234567890',
+            'PL 1234567890',
+            '123 456 78 90',
+            '123 45 67 890',
+            '123-456-78-90',
+            'PL 123-456-78-90',
+            '123-45-67-890',
         ]
 
         negative_test_strings = [
-            'NIP: 123 456 789',
-            'NIP:123-456-789',
-            '12 34 56 78 9 NIP',
+            '123 456 789',
+            'AB 123 456 789',
+            'abcdefghij',
+            '1160 2202 0000 0001',
+            '123-456-789',
+            '12 34 56 78 9',
             'qwertyuiop',
             'ala ma kota',
+            # 'KRS 0000046916 Sqd Rejonowy',
         ]
 
         nlp = spacy.load('en_core_web_sm')
@@ -52,13 +45,15 @@ class MatchersTestCase(unittest.TestCase):
     def test_bank_account_numbers(self):
         positive_test_strings = [
             'mbank: 20123456789012345678901234',
+            'mbank: PL 20123456789012345678901234',
             'mbank: 20 123456789012345678901234',
             'mbank: 20-123456789012345678901234',
+            'mbank: PL 20-123456789012345678901234',
             'mbank: 123412341234123412341234',
             'mbank: 20 1234 1234 1234 1234 1234 1234',
-            'mbank: 20-1234-1234-1234-1234-1234-1234PL',
             'mbank: 1234 1234 1234 1234 1234 1234 konto',
-            'mbank konto:1234-1234-1234-1234-1234-1234',
+            # 'mbank: 20-1234-1234-1234-1234-1234-1234PL',
+            # 'mbank konto:1234-1234-1234-1234-1234-1234',
         ]
 
         negative_test_strings = [
