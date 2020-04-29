@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 import os
 
-from matchers import NIPMatcher, BankAccountMatcher, REGONMatcher
+from matchers import NIPMatcher, BankAccountMatcher, REGONMatcher, InvoiceNumberMatcher
 
 load_dotenv()
 
@@ -16,4 +16,5 @@ NER_MATCHERS = {
     'nip_matcher': NIPMatcher,
     'bank_account_matcher': BankAccountMatcher,
     'regon_matcher': REGONMatcher,
+    'invoice_number_matcher': InvoiceNumberMatcher,
 }

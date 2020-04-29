@@ -1,12 +1,15 @@
 from spacy.matcher import Matcher
 from spacy.tokens import Doc, Span
 
+from tokenizers import create_custom_tokenizer
+
 
 class InvoiceMatcher():
     """Generic class which is extended with particular patterns and labels"""
 
     def __init__(self, nlp, label):
         """Creates a new matcher using a shared vocabulary object and sets the entity label"""
+        nlp.tokenizer = create_custom_tokenizer(nlp)
         self.matcher = Matcher(nlp.vocab)
         self.label = label
 
@@ -127,7 +130,33 @@ class REGONMatcher(InvoiceMatcher):
         super(REGONMatcher, self).__init__(nlp, label='REGON')
         patterns = [
             [
-                {'TEXT': {'REGEX': '\d{9}'}}
+                {'LOWER': 'regon'},
+                {'IS_PUNCT': True, 'OP': '?'},
+                {'IS_DIGIT': True, 'LENGTH': {'==': 9}}
+            ],
+        ]
+        self.matcher.add(self.label, None, *patterns)
+
+
+class InvoiceNumberMatcher(InvoiceMatcher):
+    """Extracts the invoice number and adds it as a document entity with the label INVOICE_NUMBER"""
+
+    def __init__(self, nlp):
+        """Creates a new REGON matcher using a shared vocabulary object"""
+        super(InvoiceNumberMatcher, self).__init__(nlp, label='INVOICE_NUMBER')
+        patterns = [
+            [
+                {'LOWER': 'faktura'},
+                {'LOWER': 'vat', 'OP': '?'},
+                {'LOWER': 'nr', 'OP': '?'},
+                {'IS_PUNCT': True, 'OP': '?'},
+                {'IS_DIGIT': True},
+                {'TEXT': '/'},
+                {'IS_DIGIT': True},
+                {'TEXT': '/', 'OP': '?'},
+                {'IS_DIGIT': True, 'OP': '?'},
+                {'TEXT': '/', 'OP': '?'},
+                {'IS_DIGIT': True, 'OP': '?'},
             ],
         ]
         self.matcher.add(self.label, None, *patterns)
