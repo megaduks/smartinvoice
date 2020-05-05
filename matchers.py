@@ -180,3 +180,55 @@ class MoneyMatcher(InvoiceMatcher):
             ],
         ]
         self.matcher.add(self.label, None, *patterns)
+
+
+class DateMatcher(InvoiceMatcher):
+    """Extracts matched dates and adds them as entites with the label DATE"""
+
+    def __init__(self, nlp):
+        super(DateMatcher, self).__init__(nlp, label='DATE')
+        patterns = [
+            [
+                {'IS_DIGIT': True, 'SHAPE': 'dd'},
+                {'TEXT': '.'},
+                {'IS_DIGIT': True, 'SHAPE': 'dd'},
+                {'TEXT': '.'},
+                {'IS_DIGIT': True, 'SHAPE': 'dddd'},
+            ],
+            [
+                {'IS_DIGIT': True, 'SHAPE': 'dddd'},
+                {'TEXT': '.'},
+                {'IS_DIGIT': True, 'SHAPE': 'dd'},
+                {'TEXT': '.'},
+                {'IS_DIGIT': True, 'SHAPE': 'dd'},
+            ],
+            [
+                {'IS_DIGIT': True, 'SHAPE': 'dd'},
+                {'TEXT': '-'},
+                {'IS_DIGIT': True, 'SHAPE': 'dd'},
+                {'TEXT': '-'},
+                {'IS_DIGIT': True, 'SHAPE': 'dddd'},
+            ],
+            [
+                {'IS_DIGIT': True, 'SHAPE': 'dddd'},
+                {'TEXT': '-'},
+                {'IS_DIGIT': True, 'SHAPE': 'dd'},
+                {'TEXT': '-'},
+                {'IS_DIGIT': True, 'SHAPE': 'dd'},
+            ],
+            [
+                {'IS_DIGIT': True, 'SHAPE': 'dd'},
+                {'TEXT': '/'},
+                {'IS_DIGIT': True, 'SHAPE': 'dd'},
+                {'TEXT': '/'},
+                {'IS_DIGIT': True, 'SHAPE': 'dddd'},
+            ],
+            [
+                {'IS_DIGIT': True, 'SHAPE': 'dddd'},
+                {'TEXT': '/'},
+                {'IS_DIGIT': True, 'SHAPE': 'dd'},
+                {'TEXT': '/'},
+                {'IS_DIGIT': True, 'SHAPE': 'dd'},
+            ],
+        ]
+        self.matcher.add(self.label, None, *patterns)

@@ -1,7 +1,8 @@
 import unittest
 import spacy
 
-from matchers import NIPMatcher, BankAccountMatcher, REGONMatcher, MoneyMatcher, InvoiceNumberMatcher
+from matchers import NIPMatcher, BankAccountMatcher, REGONMatcher, MoneyMatcher, InvoiceNumberMatcher, DateMatcher
+from tokenizers import create_custom_tokenizer
 
 
 class MatchersTestCase(unittest.TestCase):
@@ -134,6 +135,32 @@ class MatchersTestCase(unittest.TestCase):
 
         nlp = spacy.load('pl_model')
         matcher = MoneyMatcher(nlp)
+        nlp.add_pipe(matcher, after='ner')
+
+        for doc in nlp.pipe(positive_test_strings):
+            self.assertTrue(matcher.label in [e.label_ for e in doc.ents])
+
+        for doc in nlp.pipe(negative_test_strings):
+            self.assertFalse(matcher.label in [e.label_ for e in doc.ents])
+
+    def test_date(self):
+        positive_test_strings = [
+            'data sprzedaży 12-12-2019',
+            'faktura z dnia 05.05.2010',
+            'data płatności 01/01/2018',
+            'faktura 2010-09-01',
+            'data wystawienia 2010.09.01',
+        ]
+
+        negative_test_strings = [
+            'Faktura FV/01/01/19',
+            'Telefon 123-123-123',
+            'Kontakt 11.123.2323',
+        ]
+
+        nlp = spacy.load('pl_model')
+        nlp.tokenizer = create_custom_tokenizer(nlp)
+        matcher = DateMatcher(nlp)
         nlp.add_pipe(matcher, after='ner')
 
         for doc in nlp.pipe(positive_test_strings):
