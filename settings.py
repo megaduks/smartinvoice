@@ -18,3 +18,9 @@ NER_MATCHERS = {
     'regon_matcher': REGONMatcher,
     'invoice_number_matcher': InvoiceNumberMatcher,
 }
+
+MODELS = {
+    'NIP': 'models/nip_model',
+    'BANK_ACCOUNT_NO': 'models/bank_account_model',
+    'REGON': 'models/regon_model',
+}

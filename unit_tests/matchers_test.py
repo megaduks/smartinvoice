@@ -2,6 +2,7 @@ import unittest
 import spacy
 
 from matchers import NIPMatcher, BankAccountMatcher, REGONMatcher, MoneyMatcher, InvoiceNumberMatcher
+from matchers import remove_REGON_token
 
 
 class MatchersTestCase(unittest.TestCase):
@@ -86,6 +87,7 @@ class MatchersTestCase(unittest.TestCase):
         nlp = spacy.load('en_core_web_sm')
         matcher = REGONMatcher(nlp)
         nlp.add_pipe(matcher, before='ner')
+        nlp.add_pipe(remove_REGON_token, after='ner')
 
         for doc in nlp.pipe(positive_test_strings):
             self.assertTrue(matcher.label in [e.label_ for e in doc.ents])

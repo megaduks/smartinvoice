@@ -7,7 +7,7 @@ import pandas as pd
 
 from glob import glob
 
-from matchers import NIPMatcher, BankAccountMatcher, REGONMatcher, InvoiceNumberMatcher
+from matchers import NIPMatcher, BankAccountMatcher, REGONMatcher, InvoiceNumberMatcher, remove_REGON_token
 from typing import List
 from spacy.tokens import Doc
 from spacy.language import Model
@@ -16,6 +16,7 @@ from spacy.util import minibatch, compounding
 from pathlib import Path
 
 from settings import NER_MATCHERS
+from tokenizers import create_custom_tokenizer
 
 def _load_raw_data(nlp: Model, input_dir: Path, clean_str: bool=True) -> List[Doc]:
     """Reads raw TXT files, removes noisy characters and returns pre-processed documents
@@ -54,6 +55,7 @@ def main(model: str=None, ner_matcher: str=None, input_dir: Path=None, output_di
     else:
         nlp = spacy.blank("en")  # create blank Language class
         print("Created blank 'en' model")
+    nlp.tokenizer = create_custom_tokenizer(nlp)
 
     matcher = NER_MATCHERS[ner_matcher](nlp)
 
@@ -102,7 +104,7 @@ def main(model: str=None, ner_matcher: str=None, input_dir: Path=None, output_di
                 nlp.update(
                     texts,  # batch of texts
                     annotations,  # batch of annotations
-                    drop=0.5,  # dropout - make it harder to memorise data
+                    drop=0.25,  # dropout - make it harder to memorise data
                     losses=losses,
                 )
             print("Losses", losses)
@@ -117,23 +119,3 @@ def main(model: str=None, ner_matcher: str=None, input_dir: Path=None, output_di
 if __name__ == '__main__':
 
     plac.call(main)
-
-    model_path = Path('models/invoice_number_model/')
-    nlp = spacy.load(model_path)
-    matcher = InvoiceNumberMatcher(nlp)
-    nlp.add_pipe(matcher, before='ner')
-
-    input_dir = Path('data/ocr_raw_3/')
-
-    TEXTS = []
-
-    files = input_dir.glob('*.txt')
-
-    for file in files:
-        with open(file, 'r') as f:
-            TEXTS.append(f.read())
-
-    for doc in nlp.pipe(TEXTS):
-        for ent in doc.ents:
-            print(ent.text, ent.label_)
-

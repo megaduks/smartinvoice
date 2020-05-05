@@ -4,6 +4,22 @@ from spacy.tokens import Doc, Span
 from tokenizers import create_custom_tokenizer
 
 
+def remove_REGON_token(doc: Doc) -> Doc:
+    """Removes matched REGON and REGON: tokens from the matched span"""
+    new_ents = []
+    for ent in doc.ents:
+        if ent.label_ == 'REGON':
+            if doc[ent.start + 1].is_punct:
+                new_ent = Span(doc, ent.start + 2, ent.end, label=ent.label)
+            else:
+                new_ent = Span(doc, ent.start + 1, ent.end, label=ent.label)
+            new_ents.append(new_ent)
+        else:
+            new_ents.append(ent)
+    doc.ents = new_ents
+    return doc
+
+
 class InvoiceMatcher():
     """Generic class which is extended with particular patterns and labels"""
 
