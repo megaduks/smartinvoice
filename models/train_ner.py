@@ -7,7 +7,7 @@ import pandas as pd
 
 from glob import glob
 
-from matchers import NIPMatcher, BankAccountMatcher, REGONMatcher
+from matchers import NIPMatcher, BankAccountMatcher, REGONMatcher, InvoiceNumberMatcher
 from typing import List
 from spacy.tokens import Doc
 from spacy.language import Model
@@ -118,9 +118,9 @@ if __name__ == '__main__':
 
     plac.call(main)
 
-    model_path = Path('models/regon_model/')
+    model_path = Path('models/invoice_number_model/')
     nlp = spacy.load(model_path)
-    matcher = REGONMatcher(nlp)
+    matcher = InvoiceNumberMatcher(nlp)
     nlp.add_pipe(matcher, before='ner')
 
     input_dir = Path('data/ocr_raw_3/')

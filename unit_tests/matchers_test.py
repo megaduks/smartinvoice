@@ -1,7 +1,7 @@
 import unittest
 import spacy
 
-from matchers import NIPMatcher, BankAccountMatcher, REGONMatcher, MoneyMatcher
+from matchers import NIPMatcher, BankAccountMatcher, REGONMatcher, MoneyMatcher, InvoiceNumberMatcher
 
 
 class MatchersTestCase(unittest.TestCase):
@@ -62,7 +62,7 @@ class MatchersTestCase(unittest.TestCase):
         ]
 
         nlp = spacy.load('en_core_web_sm')
-        matcher = BankNumberMatcher(nlp)
+        matcher = BankAccountMatcher(nlp)
         nlp.add_pipe(matcher, before='ner')
 
         for doc in nlp.pipe(positive_test_strings):
@@ -74,8 +74,7 @@ class MatchersTestCase(unittest.TestCase):
     def test_REGON(self):
         positive_test_strings = [
             'REGON: 123456789',
-            'REG.N: 123456789 PL',
-            '123456789 REGON'
+            'REGON 123456789 PL',
         ]
 
         negative_test_strings = [
@@ -86,6 +85,31 @@ class MatchersTestCase(unittest.TestCase):
 
         nlp = spacy.load('en_core_web_sm')
         matcher = REGONMatcher(nlp)
+        nlp.add_pipe(matcher, before='ner')
+
+        for doc in nlp.pipe(positive_test_strings):
+            self.assertTrue(matcher.label in [e.label_ for e in doc.ents])
+
+        for doc in nlp.pipe(negative_test_strings):
+            self.assertFalse(matcher.label in [e.label_ for e in doc.ents])
+
+    def test_invoice_number(self):
+        positive_test_strings = [
+            'Faktura Vat nr: 1965/2019/08/0123',
+            'Faktura VAT nr: 00070560/2019',
+            'Faktura VAT nr 15/06/19/A ORYGINAŁ',
+            'FAKTURA nr 5121/0525',
+            'Faktura VAT 104/1/04/2010 oryginał',
+        ]
+
+        negative_test_strings = [
+            'ala ma kota',
+            'ala ma asa',
+            'as ma alę'
+        ]
+
+        nlp = spacy.load('en_core_web_sm')
+        matcher = InvoiceNumberMatcher(nlp)
         nlp.add_pipe(matcher, before='ner')
 
         for doc in nlp.pipe(positive_test_strings):
