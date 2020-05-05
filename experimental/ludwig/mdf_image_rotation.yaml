@@ -1,0 +1,29 @@
+input_features:
+        -
+                name: image_path
+                type: image
+                encoder: stacked_cnn
+                num_conv_layers: 3
+                filter_size: 5
+                num_filters: 32
+                num_fc_layers: 2
+                fc_size: 100
+                activation: sigmoid
+                norm: batch
+                preprocessing:
+                        height: 250
+                        width: 250
+                        num_channels: 1
+                        resize_method: interpolate
+                        scaling: pixel_normalization
+
+output_features:
+        -
+                name: label
+                type: category
+
+training:
+        dropout_rate: 0.1
+        learning_rate: 0.005
+        early_stop: 50
+        epochs: 500
