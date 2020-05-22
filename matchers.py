@@ -1,5 +1,5 @@
 from spacy.matcher import Matcher
-from spacy.tokens import Doc, Span
+from spacy.tokens import Doc, Span, Token
 
 from tokenizers import create_custom_tokenizer
 
@@ -74,7 +74,7 @@ class NIPMatcher(InvoiceMatcher):
                 {'IS_PUNCT': True, 'OP': '?'},
                 {'IS_DIGIT': True, 'SHAPE': 'dd'},
             ],
-                # 3 2 2 3 or 3-2-2-3 pattern
+            # 3 2 2 3 or 3-2-2-3 pattern
             [
                 {'TEXT': 'PL', 'OP': '?'},
                 {'IS_DIGIT': True, 'SHAPE': 'ddd'},
@@ -182,7 +182,7 @@ class MoneyMatcher(InvoiceMatcher):
     """Extracts matched monetary amounts expressed in Polish zloty and adds them as entites with the label PLN"""
 
     def __init__(self, nlp):
-        """Creates a new money matcher for Polish zloty usign a shared vocabulary object"""
+        """Creates a new money matcher for Polish zloty using a shared vocabulary object"""
         super(MoneyMatcher, self).__init__(nlp, label='PLN')
         patterns = [
             [
@@ -193,6 +193,29 @@ class MoneyMatcher(InvoiceMatcher):
             ],
             [
                 {'POS': 'NUM'}, {'LOWER': 'pln'}
+            ],
+            [
+                {'POS': 'NUM'}, {'ENT_TYPE': "MONEY"}
+            ],
+        ]
+        self.matcher.add(self.label, None, *patterns)
+
+
+class GrossValueMatcher(InvoiceMatcher):
+    """Extracts elements which resemble invoice gross amount"""
+
+    def __init__(self, nlp):
+        """Creates a new invoice gross value matcher"""
+        super(GrossValueMatcher, self).__init__(nlp, label='GROSS_VALUE')
+        patterns = [
+            [
+                {'LOWER': 'brutto'}, {'ENT_TYPE': 'MONEY'}
+            ],
+            [
+                {'LOWER': 'brutto'}, {'POS': 'NUM'}
+            ],
+            [
+                {'LOWER': 'brutta'}, {'POS': 'NUM'}
             ],
         ]
         self.matcher.add(self.label, None, *patterns)

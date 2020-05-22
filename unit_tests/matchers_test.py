@@ -1,8 +1,7 @@
 import unittest
 import spacy
 
-from matchers import NIPMatcher, BankAccountMatcher, REGONMatcher, MoneyMatcher, InvoiceNumberMatcher
-from matchers import remove_REGON_token
+from matchers import *
 
 
 class MatchersTestCase(unittest.TestCase):
@@ -125,7 +124,7 @@ class MatchersTestCase(unittest.TestCase):
             'kwota brutto 123,45 zł',
             'kwota do zapłaty 123,90 zł',
             'pozostało do rozliczenia 239,89 PLN',
-            #'kwota nierozliczona 12.34 zl'             #TODO: decimal dot is not recognized
+            'kwota nierozliczona 12.34 zl'
         ]
 
         negative_test_strings = [
@@ -137,6 +136,31 @@ class MatchersTestCase(unittest.TestCase):
         nlp = spacy.load('pl_model')
         matcher = MoneyMatcher(nlp)
         nlp.add_pipe(matcher, after='ner')
+
+        for doc in nlp.pipe(positive_test_strings):
+            self.assertTrue(matcher.label in [e.label_ for e in doc.ents])
+
+        for doc in nlp.pipe(negative_test_strings):
+            self.assertFalse(matcher.label in [e.label_ for e in doc.ents])
+
+    def test_gross_value(self):
+        positive_test_strings = [
+            'razem brutto 123 zł',
+            'brutto 100.00 zł',
+            'razem brutto 12.34 zł',
+            # 'brutto 8,50 zl', #FIXME: comma is not treated as decimal separator
+        ]
+
+        negative_test_strings = [
+            'termin zapłaty 14 dni',
+            'zakupiono 18 szt.',
+            'jabłka 12 kg',
+        ]
+
+        nlp = spacy.load('pl_model')
+
+        matcher = GrossValueMatcher(nlp)
+        nlp.add_pipe(matcher, last=True)
 
         for doc in nlp.pipe(positive_test_strings):
             self.assertTrue(matcher.label in [e.label_ for e in doc.ents])
