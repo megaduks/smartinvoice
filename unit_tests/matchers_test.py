@@ -168,6 +168,37 @@ class MatchersTestCase(unittest.TestCase):
         for doc in nlp.pipe(negative_test_strings):
             self.assertFalse(matcher.label in [e.label_ for e in doc.ents])
 
+    def test_date(self):
+        positive_test_strings = [
+            'data 2020-09-10',
+            'płatne 2020-01-01',
+            'płatne do 2020-1-1',
+            'data wystawnienia 1-1-2019',
+            'wystawiono 01-05-2010',
+            'faktura data 01-5-2019',
+            'faktura do zapłaty 10.10.2010',
+            'termin płatności 2020.05.01',
+            'termin płatności 01/01/2020',
+            'termin płatności 2020/01/01',
+        ]
+
+        negative_test_strings = [
+            'termin zapłaty 14 dni',
+            'zakupiono 18 szt.',
+            'jabłka 12 kg',
+        ]
+
+        nlp = spacy.load('pl_model')
+
+        matcher = DateMatcher(nlp)
+        nlp.add_pipe(matcher, last=True)
+
+        for doc in nlp.pipe(positive_test_strings):
+            self.assertTrue(matcher.label in [e.label_ for e in doc.ents])
+
+        for doc in nlp.pipe(negative_test_strings):
+            self.assertFalse(matcher.label in [e.label_ for e in doc.ents])
+
 
 if __name__ == '__main__':
     unittest.main()

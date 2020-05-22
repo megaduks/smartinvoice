@@ -27,7 +27,7 @@ class InvoiceClassifier:
 
         for model in models:
             if model not in self.models:
-                nlp = spacy.load(MODELS[model])
+                nlp = spacy.load(MODELS[model]['model_path'])
                 nlp.tokenizer = create_custom_tokenizer(nlp)
                 nlp.add_pipe(remove_REGON_token, after='ner')
 

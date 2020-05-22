@@ -209,13 +209,45 @@ class GrossValueMatcher(InvoiceMatcher):
         super(GrossValueMatcher, self).__init__(nlp, label='GROSS_VALUE')
         patterns = [
             [
-                {'LOWER': 'brutto'}, {'ENT_TYPE': 'MONEY'}
+                {'LOWER': 'brutto'},
+                {'ENT_TYPE': 'MONEY'}
             ],
             [
-                {'LOWER': 'brutto'}, {'POS': 'NUM'}
+                {'LOWER': {"IN": ["brutto", "brutta"]}},
+                {'IS_DIGIT': True},
+                {'TEXT': {"IN": ['-', '.']}},
+                {'IS_DIGIT': True, 'LENGTH': {"=": 2}},
             ],
             [
-                {'LOWER': 'brutta'}, {'POS': 'NUM'}
+                {'LOWER': {"IN": ["brutto", "brutta"]}},
+                {'IS_DIGIT': True},
+            ],
+        ]
+        self.matcher.add(self.label, None, *patterns)
+
+
+class DateMatcher(InvoiceMatcher):
+    """Extracts everything that looks like a date from text"""
+
+    def __init__(self, nlp):
+        """Creates a new date matcher"""
+        super(DateMatcher, self).__init__(nlp, label='DATE')
+        patterns = [
+            [
+                {'IS_DIGIT': True, 'LENGTH': {"==": 4}},
+                {'TEXT': {"IN": ['-', '.', '/']}},
+                {'IS_DIGIT': True, 'LENGTH': {"<=": 2}},
+                {'TEXT': {"IN": ['-', '.', '/']}},
+                {'IS_DIGIT': True, 'LENGTH': {"<=": 2}},
+
+            ],
+            [
+                {'IS_DIGIT': True, 'LENGTH': {"<=": 2}},
+                {'TEXT': {"IN": ['-', '.', '/']}},
+                {'IS_DIGIT': True, 'LENGTH': {"<=": 2}},
+                {'TEXT': {"IN": ['-', '.', '/']}},
+                {'IS_DIGIT': True, 'LENGTH': {"==": 4}},
+
             ],
         ]
         self.matcher.add(self.label, None, *patterns)

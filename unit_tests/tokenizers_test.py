@@ -9,7 +9,7 @@ class TokenizersTestCase(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(TokenizersTestCase, self).__init__(*args, **kwargs)
 
-    def test_tokenize_invoice(self):
+    def test_tokenization(self):
         test_strings = [
             (
                 'FAKTURA nr 5121/H0525', ['FAKTURA', 'nr', '5121', '/', 'H0525']
@@ -20,7 +20,10 @@ class TokenizersTestCase(unittest.TestCase):
             ),
             (
                 '2020-01-01', ['2020', '-', '01', '-', '01']
-            )
+            ),
+            (
+                '2020.01.01', ['2020', '.', '01', '.', '01']
+            ),
         ]
         nlp = spacy.load('pl_model')
         nlp.tokenizer = create_custom_tokenizer(nlp)

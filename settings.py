@@ -38,4 +38,9 @@ MODELS = {
         'matcher_name': 'gross_value_matcher',
         'matcher_factory': GrossValueMatcher,
     },
+    'DATE': {
+        'model_path': 'models/date_model',
+        'matcher_name': 'date_matcher',
+        'matcher_factory': DateMatcher,
+    }
 }
