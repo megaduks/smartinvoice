@@ -1,24 +1,19 @@
-import os
 import spacy
 import numpy.random as random
 import plac
 
-import pandas as pd
-
-from glob import glob
-
-from matchers import NIPMatcher, BankAccountMatcher, REGONMatcher, InvoiceNumberMatcher, remove_REGON_token
 from typing import List
 from spacy.tokens import Doc
-from spacy.language import Model
+from spacy.language import Model, Language
 from spacy.util import minibatch, compounding
 
 from pathlib import Path
 
-from settings import NER_MATCHERS
+from settings import MODELS
 from tokenizers import create_custom_tokenizer
 
-def _load_raw_data(nlp: Model, input_dir: Path, clean_str: bool=True) -> List[Doc]:
+
+def _load_raw_data(nlp: Model, input_dir: Path, clean_str: bool = True) -> List[Doc]:
     """Reads raw TXT files, removes noisy characters and returns pre-processed documents
 
     Args:
@@ -41,12 +36,11 @@ def _load_raw_data(nlp: Model, input_dir: Path, clean_str: bool=True) -> List[Do
 
 @plac.annotations(
     model=("Model name. Defaults to blank 'en' model.", "option", "m", str),
-    ner_matcher=("Required NER matcher name", "option", "e", str),
+    ner_model=("Required NER model name", "option", "e", str),
     input_dir=("Optional input directory", "option", "i", Path),
-    output_dir=("Optional output directory", "option", "o", Path),
     n_iter=("Number of training iterations", "option", "n", int),
 )
-def main(model: str=None, ner_matcher: str=None, input_dir: Path=None, output_dir: Path=None, n_iter: int=100):
+def main(model: str = None, ner_model: str = None, input_dir: Path = None, n_iter: int = 100):
     """Loads the model, set up the pipeline and train the entity recognizer."""
 
     if model is not None:
@@ -57,19 +51,19 @@ def main(model: str=None, ner_matcher: str=None, input_dir: Path=None, output_di
         print("Created blank 'en' model")
     nlp.tokenizer = create_custom_tokenizer(nlp)
 
-    matcher = NER_MATCHERS[ner_matcher](nlp)
+    matcher = MODELS[ner_model]['matcher_factory'](nlp)
 
     # create the built-in pipeline components and add them to the pipeline
     # nlp.create_pipe works for built-ins that are registered with spaCy
     if "ner" not in nlp.pipe_names:
         ner = nlp.create_pipe("ner")
         nlp.add_pipe(ner, last=True)
-        nlp.add_pipe(matcher, name=ner_matcher, before='ner')
+        nlp.add_pipe(matcher, name=MODELS[ner_model]['matcher_name'], before='ner')
         ner.add_label(matcher.label)
     # otherwise, get it so we can add labels
     else:
         ner = nlp.get_pipe("ner")
-        nlp.add_pipe(matcher,  name=ner_matcher, before='ner')
+        nlp.add_pipe(matcher, name=MODELS[ner_model]['matcher_name'], before='ner')
         ner.add_label(matcher.label)
 
     docs = _load_raw_data(nlp, input_dir=input_dir)
@@ -84,9 +78,8 @@ def main(model: str=None, ner_matcher: str=None, input_dir: Path=None, output_di
             training_example = (doc.text, {"entities": entities})
             TRAIN_DATA.append(training_example)
 
-
     # get names of other pipes to disable them during training
-    pipe_exceptions = ["ner", "trf_wordpiecer", "trf_tok2vec", ner_matcher]
+    pipe_exceptions = ["ner", "trf_wordpiecer", "trf_tok2vec", MODELS[ner_model]['matcher_name']]
     other_pipes = [pipe for pipe in nlp.pipe_names if pipe not in pipe_exceptions]
 
     with nlp.disable_pipes(*other_pipes):  # only train NER
@@ -109,13 +102,14 @@ def main(model: str=None, ner_matcher: str=None, input_dir: Path=None, output_di
                 )
             print("Losses", losses)
 
+    output_dir = Path(MODELS[ner_model]['model_path'])
+
     if not output_dir.exists():
         output_dir.mkdir()
 
-    with nlp.disable_pipes(ner_matcher):
+    with nlp.disable_pipes(MODELS[ner_model]['matcher_name']):
         nlp.to_disk(output_dir)
 
 
 if __name__ == '__main__':
-
     plac.call(main)
