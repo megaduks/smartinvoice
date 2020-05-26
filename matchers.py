@@ -1,5 +1,23 @@
 from spacy.matcher import Matcher
-from spacy.tokens import Doc, Span
+from spacy.tokens import Doc, Span, Token
+
+from tokenizers import create_custom_tokenizer
+
+
+def remove_REGON_token(doc: Doc) -> Doc:
+    """Removes matched REGON and REGON: tokens from the matched span"""
+    new_ents = []
+    for ent in doc.ents:
+        if ent.label_ == 'REGON':
+            if doc[ent.start + 1].is_punct:
+                new_ent = Span(doc, ent.start + 2, ent.end, label=ent.label)
+            else:
+                new_ent = Span(doc, ent.start + 1, ent.end, label=ent.label)
+            new_ents.append(new_ent)
+        else:
+            new_ents.append(ent)
+    doc.ents = new_ents
+    return doc
 
 
 class InvoiceMatcher():
@@ -7,6 +25,7 @@ class InvoiceMatcher():
 
     def __init__(self, nlp, label):
         """Creates a new matcher using a shared vocabulary object and sets the entity label"""
+        nlp.tokenizer = create_custom_tokenizer(nlp)
         self.matcher = Matcher(nlp.vocab)
         self.label = label
 
@@ -55,7 +74,7 @@ class NIPMatcher(InvoiceMatcher):
                 {'IS_PUNCT': True, 'OP': '?'},
                 {'IS_DIGIT': True, 'SHAPE': 'dd'},
             ],
-                # 3 2 2 3 or 3-2-2-3 pattern
+            # 3 2 2 3 or 3-2-2-3 pattern
             [
                 {'TEXT': 'PL', 'OP': '?'},
                 {'IS_DIGIT': True, 'SHAPE': 'ddd'},
@@ -127,7 +146,33 @@ class REGONMatcher(InvoiceMatcher):
         super(REGONMatcher, self).__init__(nlp, label='REGON')
         patterns = [
             [
-                {'TEXT': {'REGEX': '\d{9}'}}
+                {'LOWER': 'regon'},
+                {'IS_PUNCT': True, 'OP': '?'},
+                {'IS_DIGIT': True, 'LENGTH': {'==': 9}}
+            ],
+        ]
+        self.matcher.add(self.label, None, *patterns)
+
+
+class InvoiceNumberMatcher(InvoiceMatcher):
+    """Extracts the invoice number and adds it as a document entity with the label INVOICE_NUMBER"""
+
+    def __init__(self, nlp):
+        """Creates a new REGON matcher using a shared vocabulary object"""
+        super(InvoiceNumberMatcher, self).__init__(nlp, label='INVOICE_NUMBER')
+        patterns = [
+            [
+                {'LOWER': 'faktura'},
+                {'LOWER': 'vat', 'OP': '?'},
+                {'LOWER': 'nr', 'OP': '?'},
+                {'IS_PUNCT': True, 'OP': '?'},
+                {'IS_DIGIT': True},
+                {'TEXT': '/'},
+                {'IS_DIGIT': True},
+                {'TEXT': '/', 'OP': '?'},
+                {'IS_DIGIT': True, 'OP': '?'},
+                {'TEXT': '/', 'OP': '?'},
+                {'IS_DIGIT': True, 'OP': '?'},
             ],
         ]
         self.matcher.add(self.label, None, *patterns)
@@ -137,7 +182,7 @@ class MoneyMatcher(InvoiceMatcher):
     """Extracts matched monetary amounts expressed in Polish zloty and adds them as entites with the label PLN"""
 
     def __init__(self, nlp):
-        """Creates a new money matcher for Polish zloty usign a shared vocabulary object"""
+        """Creates a new money matcher for Polish zloty using a shared vocabulary object"""
         super(MoneyMatcher, self).__init__(nlp, label='PLN')
         patterns = [
             [
@@ -148,6 +193,61 @@ class MoneyMatcher(InvoiceMatcher):
             ],
             [
                 {'POS': 'NUM'}, {'LOWER': 'pln'}
+            ],
+            [
+                {'POS': 'NUM'}, {'ENT_TYPE': "MONEY"}
+            ],
+        ]
+        self.matcher.add(self.label, None, *patterns)
+
+
+class GrossValueMatcher(InvoiceMatcher):
+    """Extracts elements which resemble invoice gross amount"""
+
+    def __init__(self, nlp):
+        """Creates a new invoice gross value matcher"""
+        super(GrossValueMatcher, self).__init__(nlp, label='GROSS_VALUE')
+        patterns = [
+            [
+                {'LOWER': 'brutto'},
+                {'ENT_TYPE': 'MONEY'}
+            ],
+            [
+                {'LOWER': {"IN": ["brutto", "brutta"]}},
+                {'IS_DIGIT': True},
+                {'TEXT': {"IN": ['-', '.']}},
+                {'IS_DIGIT': True, 'LENGTH': {"=": 2}},
+            ],
+            [
+                {'LOWER': {"IN": ["brutto", "brutta"]}},
+                {'IS_DIGIT': True},
+            ],
+        ]
+        self.matcher.add(self.label, None, *patterns)
+
+
+class DateMatcher(InvoiceMatcher):
+    """Extracts everything that looks like a date from text"""
+
+    def __init__(self, nlp):
+        """Creates a new date matcher"""
+        super(DateMatcher, self).__init__(nlp, label='DATE')
+        patterns = [
+            [
+                {'IS_DIGIT': True, 'LENGTH': {"==": 4}},
+                {'TEXT': {"IN": ['-', '.', '/']}},
+                {'IS_DIGIT': True, 'LENGTH': {"<=": 2}},
+                {'TEXT': {"IN": ['-', '.', '/']}},
+                {'IS_DIGIT': True, 'LENGTH': {"<=": 2}},
+
+            ],
+            [
+                {'IS_DIGIT': True, 'LENGTH': {"<=": 2}},
+                {'TEXT': {"IN": ['-', '.', '/']}},
+                {'IS_DIGIT': True, 'LENGTH': {"<=": 2}},
+                {'TEXT': {"IN": ['-', '.', '/']}},
+                {'IS_DIGIT': True, 'LENGTH': {"==": 4}},
+
             ],
         ]
         self.matcher.add(self.label, None, *patterns)

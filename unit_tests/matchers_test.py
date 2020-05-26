@@ -1,7 +1,7 @@
 import unittest
 import spacy
 
-from matchers import NIPMatcher, BankAccountMatcher, REGONMatcher, MoneyMatcher
+from matchers import *
 
 
 class MatchersTestCase(unittest.TestCase):
@@ -62,7 +62,7 @@ class MatchersTestCase(unittest.TestCase):
         ]
 
         nlp = spacy.load('en_core_web_sm')
-        matcher = BankNumberMatcher(nlp)
+        matcher = BankAccountMatcher(nlp)
         nlp.add_pipe(matcher, before='ner')
 
         for doc in nlp.pipe(positive_test_strings):
@@ -74,8 +74,7 @@ class MatchersTestCase(unittest.TestCase):
     def test_REGON(self):
         positive_test_strings = [
             'REGON: 123456789',
-            'REG.N: 123456789 PL',
-            '123456789 REGON'
+            'REGON 123456789 PL',
         ]
 
         negative_test_strings = [
@@ -86,6 +85,32 @@ class MatchersTestCase(unittest.TestCase):
 
         nlp = spacy.load('en_core_web_sm')
         matcher = REGONMatcher(nlp)
+        nlp.add_pipe(matcher, before='ner')
+        nlp.add_pipe(remove_REGON_token, after='ner')
+
+        for doc in nlp.pipe(positive_test_strings):
+            self.assertTrue(matcher.label in [e.label_ for e in doc.ents])
+
+        for doc in nlp.pipe(negative_test_strings):
+            self.assertFalse(matcher.label in [e.label_ for e in doc.ents])
+
+    def test_invoice_number(self):
+        positive_test_strings = [
+            'Faktura Vat nr: 1965/2019/08/0123',
+            'Faktura VAT nr: 00070560/2019',
+            'Faktura VAT nr 15/06/19/A ORYGINAŁ',
+            'FAKTURA nr 5121/0525',
+            'Faktura VAT 104/1/04/2010 oryginał',
+        ]
+
+        negative_test_strings = [
+            'ala ma kota',
+            'ala ma asa',
+            'as ma alę'
+        ]
+
+        nlp = spacy.load('en_core_web_sm')
+        matcher = InvoiceNumberMatcher(nlp)
         nlp.add_pipe(matcher, before='ner')
 
         for doc in nlp.pipe(positive_test_strings):
@@ -99,7 +124,7 @@ class MatchersTestCase(unittest.TestCase):
             'kwota brutto 123,45 zł',
             'kwota do zapłaty 123,90 zł',
             'pozostało do rozliczenia 239,89 PLN',
-            #'kwota nierozliczona 12.34 zl'             #TODO: decimal dot is not recognized
+            'kwota nierozliczona 12.34 zl'
         ]
 
         negative_test_strings = [
@@ -111,6 +136,62 @@ class MatchersTestCase(unittest.TestCase):
         nlp = spacy.load('pl_model')
         matcher = MoneyMatcher(nlp)
         nlp.add_pipe(matcher, after='ner')
+
+        for doc in nlp.pipe(positive_test_strings):
+            self.assertTrue(matcher.label in [e.label_ for e in doc.ents])
+
+        for doc in nlp.pipe(negative_test_strings):
+            self.assertFalse(matcher.label in [e.label_ for e in doc.ents])
+
+    def test_gross_value(self):
+        positive_test_strings = [
+            'razem brutto 123 zł',
+            'brutto 100.00 zł',
+            'razem brutto 12.34 zł',
+            # 'brutto 8,50 zl', #FIXME: comma is not treated as decimal separator
+        ]
+
+        negative_test_strings = [
+            'termin zapłaty 14 dni',
+            'zakupiono 18 szt.',
+            'jabłka 12 kg',
+        ]
+
+        nlp = spacy.load('pl_model')
+
+        matcher = GrossValueMatcher(nlp)
+        nlp.add_pipe(matcher, last=True)
+
+        for doc in nlp.pipe(positive_test_strings):
+            self.assertTrue(matcher.label in [e.label_ for e in doc.ents])
+
+        for doc in nlp.pipe(negative_test_strings):
+            self.assertFalse(matcher.label in [e.label_ for e in doc.ents])
+
+    def test_date(self):
+        positive_test_strings = [
+            'data 2020-09-10',
+            'płatne 2020-01-01',
+            'płatne do 2020-1-1',
+            'data wystawnienia 1-1-2019',
+            'wystawiono 01-05-2010',
+            'faktura data 01-5-2019',
+            'faktura do zapłaty 10.10.2010',
+            'termin płatności 2020.05.01',
+            'termin płatności 01/01/2020',
+            'termin płatności 2020/01/01',
+        ]
+
+        negative_test_strings = [
+            'termin zapłaty 14 dni',
+            'zakupiono 18 szt.',
+            'jabłka 12 kg',
+        ]
+
+        nlp = spacy.load('pl_model')
+
+        matcher = DateMatcher(nlp)
+        nlp.add_pipe(matcher, last=True)
 
         for doc in nlp.pipe(positive_test_strings):
             self.assertTrue(matcher.label in [e.label_ for e in doc.ents])
