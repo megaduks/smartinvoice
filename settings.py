@@ -45,4 +45,4 @@ MODELS = {
     }
 }
 
-NOISE_CHARACTERS = '|{}[]()"!<>'
+NOISE_CHARACTERS = '|{}[]()"!<>=^`~'
