@@ -44,3 +44,5 @@ MODELS = {
         'matcher_factory': DateMatcher,
     }
 }
+
+NOISE_CHARACTERS = '|{}[]()"!<>'

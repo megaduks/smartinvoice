@@ -1,13 +1,14 @@
 import unittest
 import spacy
 
-from tokenizers import create_custom_tokenizer
+import tokenizers
 
 
 class TokenizersTestCase(unittest.TestCase):
 
     def __init__(self, *args, **kwargs):
         super(TokenizersTestCase, self).__init__(*args, **kwargs)
+        self.nlp = spacy.blank('pl')
 
     def test_tokenization(self):
         test_strings = [
@@ -25,11 +26,15 @@ class TokenizersTestCase(unittest.TestCase):
                 '2020.01.01', ['2020', '.', '01', '.', '01']
             ),
         ]
-        nlp = spacy.load('pl_model')
-        nlp.tokenizer = create_custom_tokenizer(nlp)
+        self.nlp.tokenizer = tokenizers.create_custom_tokenizer(self.nlp)
 
         for _input, _output in test_strings:
-            self.assertCountEqual(map(str, nlp(_input)), _output)
+            self.assertCountEqual(map(str, self.nlp(_input)), _output)
+
+    def test_sanitization(self):
+        _input = self.nlp('Ala! | ma{kota}')
+        _output = self.nlp('Ala ma kota')
+        self.assertEqual(tokenizers.sanitizer(_input).text, _output.text)
 
 
 if __name__ == '__main__':

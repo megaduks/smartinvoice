@@ -1,8 +1,7 @@
 from spacy.matcher import Matcher
 from spacy.tokens import Doc, Span, Token
 
-from tokenizers import create_custom_tokenizer
-
+import tokenizers
 
 def remove_REGON_token(doc: Doc) -> Doc:
     """Removes matched REGON and REGON: tokens from the matched span"""
@@ -25,7 +24,7 @@ class InvoiceMatcher():
 
     def __init__(self, nlp, label):
         """Creates a new matcher using a shared vocabulary object and sets the entity label"""
-        nlp.tokenizer = create_custom_tokenizer(nlp)
+        nlp.tokenizer = tokenizers.create_custom_tokenizer(nlp)
         self.matcher = Matcher(nlp.vocab)
         self.label = label
 

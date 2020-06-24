@@ -1,6 +1,7 @@
 import spacy
 
-from spacy.language import Language, Tokenizer
+from spacy.language import Language, Tokenizer, Doc
+from settings import NOISE_CHARACTERS
 
 
 def create_custom_tokenizer(nlp: Language) -> Tokenizer:
@@ -16,3 +17,18 @@ def create_custom_tokenizer(nlp: Language) -> Tokenizer:
                      infix_finditer=infix_re.finditer,
                      suffix_search=suffix_re.search,
                      token_match=None)
+
+
+def sanitizer(doc: Doc) -> Doc:
+    """Removes noise characters from the document"""
+
+    nlp = spacy.blank('pl')
+
+    sanitized_text = doc.text
+
+    for char in NOISE_CHARACTERS:
+        sanitized_text = sanitized_text.replace(char, ' ')
+
+    sanitized_text = ' '.join(sanitized_text.split())
+
+    return nlp(sanitized_text)
