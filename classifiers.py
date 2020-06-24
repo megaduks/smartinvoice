@@ -50,7 +50,8 @@ def main(input_dir: Path, models: List):
     clf = InvoiceClassifier()
 
     input_files = input_dir.glob('*.txt')
-    models = models.split(',')
+
+    models = map(str.strip, models.split(',')) if models else None
 
     for input_file in input_files:
         with open(input_file,'rt') as f:
