@@ -94,3 +94,5 @@ fabric.properties
 *.ipynb
 
 # End of https://www.gitignore.io/api/pycharm
+/data/processed/ocr/
+/data/ocr/
