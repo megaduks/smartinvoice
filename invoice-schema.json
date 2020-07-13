@@ -3,8 +3,8 @@
     "$id": "/github.com/megaduks/smartinvoice/invoice.schema.json",
     "title": "Schemat JSON danych pojawiających się na fakturach",
     "description": "Schemat opisujący typy atrybutów jakie mogą się pojawić na różnego rodzaju fakturach wystawianych w Polsce. Schemat został stworzony na potrzeby procesu automatycznego rozpoznawania i anotowania cyfrowych faktur.",
-    "version_number": "0.2",
-    "version_date": "2020-01-17",
+    "version_number": "0.3",
+    "version_date": "2020-07-13",
     "type": "object",
     "properties": {
         "numer_faktury": {
@@ -88,7 +88,7 @@
             "items": {
                 "type": "object",
                 "properties": {
-                    "stawka_podatku": { "type": "number", "enum": [0, 5, 8, 23] },
+                    "stawka_podatku": { "type": "string", "enum": ["0", "4", "5", "7", "8", "23", "NP", "ZW"] },
                     "wartosc_netto": { "type": "number" },
                     "podatek": { "type": "number" },
                     "wartosc_brutto": { "type": "number" }
@@ -102,7 +102,7 @@
         "forma_platnosci": {
             "description": "Jaka forma płatności jest przewidziana?",
             "type": "string",
-            "enum": ["przelew", "gotówka", "karta"]
+            "enum": ["przelew", "gotówka", "karta płatnicza", "barter", "czek", "weksel", "za pobraniem", "kompensata", "akredytywa", "PayPal", "PayU", "inny" ]
         },
         "termin_platnosci": {
             "description": "Termin płatności w przypadku przelewu",
