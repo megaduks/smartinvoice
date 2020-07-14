@@ -3,7 +3,7 @@
     "$id": "/github.com/megaduks/smartinvoice/invoice.schema.json",
     "title": "Schemat JSON danych pojawiających się na fakturach",
     "description": "Schemat opisujący typy atrybutów jakie mogą się pojawić na różnego rodzaju fakturach wystawianych w Polsce. Schemat został stworzony na potrzeby procesu automatycznego rozpoznawania i anotowania cyfrowych faktur.",
-    "version_number": "0.4",
+    "version_number": "0.5",
     "version_date": "2020-07-13",
     "type": "object",
     "properties": {
@@ -14,7 +14,7 @@
         "typ_faktury": {
             "description": "Typ faktury, np. faktura sprzedażowa, faktura pro-forma, zaliczka",
             "type": "string",
-            "enum": ["faktura_vat","pro_forma","zaliczka","rozliczenie_zaliczki","faktura_rr", "faktura_mp" ]
+            "enum": ["faktura_vat","pro_forma","zaliczka","rozliczenie_zaliczki","faktura_rr", "faktura_mp", "faktura_korygujaca" ]
         },
         "data_sprzedazy": {
             "description": "Data faktycznej sprzedaży towaru lub usługi",
