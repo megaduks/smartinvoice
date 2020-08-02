@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 import os
 
 from matchers import *
+from pathlib import Path
 
 load_dotenv()
 
@@ -11,6 +12,9 @@ ML_SIGNATURE = os.getenv("ML_SIGNATURE")
 RABBITMQ_LOGIN = os.getenv("RABBITMQ_LOGIN")
 RABBITMQ_PASSWORD = os.getenv("RABBITMQ_PASSWORD")
 RABBITMQ_SERVER = os.getenv("RABBITMQ_SERVER")
+
+INVOICE_IMAGE_MODEL = Path('experimental/ludwig/invoice_photo/results/experiment_run_10/model')
+INVOICE_NER_MODEL = Path('experimental/prodigy/invoice_model_final')
 
 MODELS = {
     'NIP': {
@@ -42,5 +46,10 @@ MODELS = {
         'model_path': 'models/date_model',
         'matcher_name': 'date_matcher',
         'matcher_factory': DateMatcher,
-    }
+    },
+    'MONEY': {
+        'model_path': 'models/money_model',
+        'matcher_name': 'money_matcher',
+        'matcher_factory': MoneyMatcher,
+    },
 }
