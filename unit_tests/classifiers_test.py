@@ -12,9 +12,9 @@ class ClassifiersTestCase(unittest.TestCase):
         self.model = InvoicePhotoClassifier(INVOICE_IMAGE_MODEL)
 
     def test_invoice_image_classifier(self):
-        puppy_image = Path('/home/mikolaj/Research/smartinvoice/data/images/puppy.jpg')
-        book_image = Path('/home/mikolaj/Research/smartinvoice/data/images/book.jpeg')
-        invoice_image = Path('/home/mikolaj/Research/smartinvoice/data/images/invoice.jpeg')
+        puppy_image = Path('/data/test/puppy.jpg')
+        book_image = Path('/data/test/book.jpeg')
+        invoice_image = Path('/data/test/invoice.jpeg')
 
         self.assertFalse(self.model.predict(puppy_image))
         self.assertFalse(self.model.predict(book_image))
