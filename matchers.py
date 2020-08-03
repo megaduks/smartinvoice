@@ -8,7 +8,7 @@ def remove_REGON_token(doc: Doc) -> Doc:
     """Removes matched REGON and REGON: tokens from the matched span"""
     new_ents = []
     for ent in doc.ents:
-        if ent.label_ == 'REGON':
+        if ent.label_ == 'regon':
             if doc[ent.start + 1].is_punct:
                 new_ent = Span(doc, ent.start + 2, ent.end, label=ent.label)
             else:
@@ -52,7 +52,7 @@ class NIPMatcher(InvoiceMatcher):
 
     def __init__(self, nlp):
         """Creates a new NIP matcher using a shared vocabulary object"""
-        super(NIPMatcher, self).__init__(nlp, label='NIP')
+        super(NIPMatcher, self).__init__(nlp, label='nip')
 
         # TODO: add matching expressions for PLxxxxxxxxxx, PLxxx xxx xx xx, etc.
         # TODO: add recognition of KRS numbers (identical format as NIP)
@@ -94,7 +94,7 @@ class BankAccountMatcher(InvoiceMatcher):
 
     def __init__(self, nlp):
         """Creates a new bank number account matcher using a shared vocabulary object"""
-        super(BankAccountMatcher, self).__init__(nlp, label='BANK_ACCOUNT_NO')
+        super(BankAccountMatcher, self).__init__(nlp, label='bank_account_no')
 
         # TODO: allow for PL to be glued to the first/last digit of the account number
         # TODO: fix the colon as the separator, now "konto:1234 1234 1234 ..." will not be matched
@@ -143,7 +143,7 @@ class REGONMatcher(InvoiceMatcher):
 
     def __init__(self, nlp):
         """Creates a new REGON matcher using a shared vocabulary object"""
-        super(REGONMatcher, self).__init__(nlp, label='REGON')
+        super(REGONMatcher, self).__init__(nlp, label='regon')
         patterns = [
             [
                 {'LOWER': 'regon'},
@@ -159,7 +159,7 @@ class InvoiceNumberMatcher(InvoiceMatcher):
 
     def __init__(self, nlp):
         """Creates a new REGON matcher using a shared vocabulary object"""
-        super(InvoiceNumberMatcher, self).__init__(nlp, label='INVOICE_NUMBER')
+        super(InvoiceNumberMatcher, self).__init__(nlp, label='invoice_no')
         patterns = [
             [
                 {'LOWER': 'faktura'},
@@ -183,7 +183,7 @@ class MoneyMatcher(InvoiceMatcher):
 
     def __init__(self, nlp):
         """Creates a new money matcher for Polish zloty using a shared vocabulary object"""
-        super(MoneyMatcher, self).__init__(nlp, label='PLN')
+        super(MoneyMatcher, self).__init__(nlp, label='money')
         patterns = [
             [
                 {'POS': 'NUM'}, {'LOWER': 'zł'}
@@ -206,7 +206,7 @@ class GrossValueMatcher(InvoiceMatcher):
 
     def __init__(self, nlp):
         """Creates a new invoice gross value matcher"""
-        super(GrossValueMatcher, self).__init__(nlp, label='GROSS_VALUE')
+        super(GrossValueMatcher, self).__init__(nlp, label='gross_val')
         patterns = [
             [
                 {'LOWER': 'brutto'},
@@ -231,21 +231,21 @@ class DateMatcher(InvoiceMatcher):
 
     def __init__(self, nlp):
         """Creates a new date matcher"""
-        super(DateMatcher, self).__init__(nlp, label='DATE')
+        super(DateMatcher, self).__init__(nlp, label='data')
         patterns = [
             [
                 {'IS_DIGIT': True, 'LENGTH': {"==": 4}},
-                {'TEXT': {"IN": ['-', '.', '/']}},
+                {'TEXT': {"IN": ['-', '.']}},
                 {'IS_DIGIT': True, 'LENGTH': {"<=": 2}},
-                {'TEXT': {"IN": ['-', '.', '/']}},
+                {'TEXT': {"IN": ['-', '.']}},
                 {'IS_DIGIT': True, 'LENGTH': {"<=": 2}},
 
             ],
             [
                 {'IS_DIGIT': True, 'LENGTH': {"<=": 2}},
-                {'TEXT': {"IN": ['-', '.', '/']}},
+                {'TEXT': {"IN": ['-', '.']}},
                 {'IS_DIGIT': True, 'LENGTH': {"<=": 2}},
-                {'TEXT': {"IN": ['-', '.', '/']}},
+                {'TEXT': {"IN": ['-', '.']}},
                 {'IS_DIGIT': True, 'LENGTH': {"==": 4}},
 
             ],

@@ -1,0 +1,39 @@
+{
+    "class": {
+        "idx2str": [
+            "<UNK>",
+            "invoice",
+            "other"
+        ],
+        "preprocessing": {
+            "fill_value": "<UNK>",
+            "lowercase": false,
+            "missing_value_strategy": "fill_with_const",
+            "most_common": 10000
+        },
+        "str2freq": {
+            "<UNK>": 0,
+            "invoice": 232,
+            "other": 78
+        },
+        "str2idx": {
+            "<UNK>": 0,
+            "invoice": 1,
+            "other": 2
+        },
+        "vocab_size": 3
+    },
+    "data_train_hdf5_fp": "data/data.hdf5",
+    "image_path": {
+        "preprocessing": {
+            "height": 120,
+            "in_memory": false,
+            "missing_value_strategy": "backfill",
+            "num_channels": 3,
+            "num_processes": 1,
+            "resize_method": "interpolate",
+            "scaling": "pixel_normalization",
+            "width": 120
+        }
+    }
+}

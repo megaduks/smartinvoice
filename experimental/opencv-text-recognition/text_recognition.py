@@ -1,6 +1,6 @@
 # USAGE
-# python text_recognition.py --east frozen_east_text_detection.pb --image images/example_01.jpg
-# python text_recognition.py --east frozen_east_text_detection.pb --image images/example_04.jpg --padding 0.05
+# python text_recognition.py --east frozen_east_text_detection.pb --image test/example_01.jpg
+# python text_recognition.py --east frozen_east_text_detection.pb --image test/example_04.jpg --padding 0.05
 
 # import the necessary packages
 from imutils.object_detection import non_max_suppression
@@ -16,7 +16,7 @@ from typing import List
 
 def correct_skew(image: np.ndarray, delta=0.05, limit=5) -> np.ndarray:
 
-    '''corrects skew in images using the Projection Profile method, limited in maximum angle of skew,
+    '''corrects skew in test using the Projection Profile method, limited in maximum angle of skew,
     delta determines step between angles checked'''
 
 
@@ -103,7 +103,7 @@ def group_boxes(boxes: List[np.ndarray]) -> List[np.ndarray]:
 
 
 def resize_img(orgH : int, width : int):
-    #TODO: resize horizontal images
+    #TODO: resize horizontal test
     pass
 
 
@@ -186,7 +186,7 @@ ap.add_argument("-e", "--height", type=int, default=1920,
 ap.add_argument("-p", "--padding", type=float, default=0.1,
                 help="amount of padding to add to each border of ROI")
 ap.add_argument("-d", "--display", type=bool, default=False,
-                help="whenever to display the images with bounding boxes")
+                help="whenever to display the test with bounding boxes")
 ap.add_argument("-pt", "--padText", type=bool, default=True,
                 help="add space to every output from tesseract")
 args = vars(ap.parse_args())
