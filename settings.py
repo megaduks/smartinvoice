@@ -6,12 +6,19 @@ from pathlib import Path
 
 load_dotenv()
 
+#OCR Parameters
+OCR_MIN_CONFIDENCE = 0.5
+OCR_PADDING = 0.1
+OCR_TESSERACT_CONFIG = "-l pol --oem 1  --psm 7"
+
 UPLOAD_URL = os.getenv("UPLOAD_URL")
 ML_SIGNATURE = os.getenv("ML_SIGNATURE")
+DOWNLOAD_URL = os.getenv("DOWNLOAD_URL")
 
 RABBITMQ_LOGIN = os.getenv("RABBITMQ_LOGIN")
 RABBITMQ_PASSWORD = os.getenv("RABBITMQ_PASSWORD")
 RABBITMQ_SERVER = os.getenv("RABBITMQ_SERVER")
+RABBITMQ_EXCHANGE_NAME = os.getenv("EXCHANGE_NAME")
 
 INVOICE_IMAGE_MODEL = Path('experimental/ludwig/invoice_photo/results/experiment_run_10/model')
 INVOICE_NER_MODEL = Path('models/invoice_final_ner_model')
