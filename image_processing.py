@@ -228,16 +228,22 @@ class InvoiceOCR:
 
             # add the bounding box coordinates and OCR'd text to the list
             # of results
+            #results.append(((startX, startY, endX, endY), text))
             results.append(((startX, startY, endX, endY), text))
 
         # sort the results bounding box coordinates from top to bottom:
         results = sorted(results, key=lambda r: r[0][1])
-        return results
+
+        OCR_text_output = ""
+        for _, text in results:
+            OCR_text_output += text
+
+        return OCR_text_output
         # save results to a .txt file:
 
-        #with open(f"{imgName}.txt", "w") as file:
-        #   for _, text in results:
-        #       file.write(text)
+        #with open("test.txt", "w") as file:
+        # for _, text in results:
+         #     file.write(text)
 
 
 if __name__ == '__main__':

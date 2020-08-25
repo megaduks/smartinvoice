@@ -19,8 +19,8 @@ def sendJSON(data: Dict, job_id: str, file_id: str) -> object:
         response.raise_for_status()
     except requests.exceptions.HTTPError as err:
         print("Failed to send")
-        print(err)
-
+        print(response.text)
+    print(response)
     return response
 
 
