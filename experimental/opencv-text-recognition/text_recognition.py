@@ -75,21 +75,6 @@ def group_boxes(boxes: List[np.ndarray]) -> List[np.ndarray]:
         idx1 = idx2
         groups.append(subGroup)
 
-    '''
-    for box in boxes:
-        subGroup = []
-        currBox = box
-        del box
-        subGroup.append(currBox)
-        end = currBox[2]
-        for nBox in boxes:
-            if abs(currBox[1] - nBox[1]) <= verticalThreshold and abs(currBox[3] - nBox[3]) <= verticalThreshold:
-                subGroup.append(nBox)
-                end = nBox[2]
-                del nBox
-        groups.append(subGroup)
-    '''
-
     # startX, startY, endX, endY
     # creating a new box that contains the ones in the subgroup
     for sub in groups:
