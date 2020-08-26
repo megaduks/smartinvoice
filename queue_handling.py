@@ -2,6 +2,7 @@ import pika
 import json
 import spacy
 import cv2
+
 from settings import RABBITMQ_PASSWORD, RABBITMQ_LOGIN, RABBITMQ_SERVER, RABBITMQ_EXCHANGE_NAME
 from net_tools import sendJSON, getImageFromToken
 from image_processing import InvoiceOCR
@@ -14,7 +15,7 @@ exchange_name = RABBITMQ_EXCHANGE_NAME
 model = "/home/oliver/Documents/smartinvoice/experimental/prodigy/invoice_model_final/"
 
 
-def processResponse(response, method_frame, OCR, NLP):
+def processResponse(response, method_frame, OCR, NER):
     data = json.loads(response.decode('utf-8'))
     print(f"Received message : {data}")
     print(" [INFO]Downloading image. ")
@@ -30,7 +31,7 @@ def processResponse(response, method_frame, OCR, NLP):
         OCR_text_output = OCR.process_image(image)
 
         print("[INFO] Processing OCR Output")
-        ner_results = NLP.predict(OCR_text_output)
+        ner_results = NER.predict(OCR_text_output)
 
     payload = {}
     for d in ner_results:
@@ -52,7 +53,7 @@ def checkPayload(payload: Dict) -> Dict:
     if "typ_faktury" not in payload.keys():
         payload["typ_faktury"] = "faktura_vat"
     if "razem_kwota_brutto" not in payload.keys():
-        payload["razem_kwota_brutto"] = 0,
+        payload["razem_kwota_brutto"] = 0
     if "rozliczenie_vat" not in payload.keys():
         payload["rozliczenie_vat"] = [{}]
 
@@ -97,7 +98,7 @@ def startConsuming(parameters, OCR, NLP):
             channel.basic_ack(method_frame.delivery_tag)
         except:
             print("Failed to process image")
-            break
+            channel.basic_ack(method_frame.delivery_tag)
 
         if method_frame.delivery_tag == 100:
             break
