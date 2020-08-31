@@ -7,7 +7,7 @@ from settings import RABBITMQ_PASSWORD, RABBITMQ_LOGIN, RABBITMQ_SERVER, RABBITM
 from net_tools import sendJSON, getImageFromToken
 from image_processing import InvoiceOCR
 from classifiers import InvoiceNERClassifier
-from typing import Dict
+from typing import Dict, List
 
 credentials = pika.PlainCredentials(RABBITMQ_LOGIN, RABBITMQ_PASSWORD)
 parameters = pika.ConnectionParameters(host=RABBITMQ_SERVER, port=5672, virtual_host="/", credentials=credentials)
@@ -18,7 +18,7 @@ model = "/home/oliver/Documents/smartinvoice/experimental/prodigy/invoice_model_
 def processResponse(response, method_frame, OCR, NER):
     data = json.loads(response.decode('utf-8'))
     print(f"Received message : {data}")
-    print(" [INFO]Downloading image. ")
+    print("[INFO] Downloading image. ")
     image = getImageFromToken(data["download_token"])
     ner_results = []
 
@@ -33,16 +33,28 @@ def processResponse(response, method_frame, OCR, NER):
         print("[INFO] Processing OCR Output")
         ner_results = NER.predict(OCR_text_output)
 
-    payload = {}
+    payload = {"rozliczenie_vat": []}
+    payload["rozliczenie_vat"].append({"stawka_podatku": 0,
+                                       "wartosc_netto": 0,
+                                       "podatek": 0,
+                                       "wartosc_brutto": 0})
+
+    keys = ["stawka_podatku", "wartosc_netto", "podatek", "wartosc_brutto"]
+
     for d in ner_results:
         payload.update(d)
 
+    for key in payload.keys():
+        if key in keys:
+            payload["rozliczenie_vat"][0][key] = payload[key]
+
     print(payload)
     payload = checkPayload(payload)
+    payload = cleanPayload(payload, keys)
     print(payload)
 
     print("[INFO] Sending JSON")
-    sendJSON(data=payload, job_id=data['job_id'], file_id=data['file_id'])
+    sendJSON(payload=payload, job_id=data['job_id'], file_id=data['file_id'])
 
 
 def checkPayload(payload: Dict) -> Dict:
@@ -54,8 +66,13 @@ def checkPayload(payload: Dict) -> Dict:
         payload["typ_faktury"] = "faktura_vat"
     if "razem_kwota_brutto" not in payload.keys():
         payload["razem_kwota_brutto"] = 0
-    if "rozliczenie_vat" not in payload.keys():
-        payload["rozliczenie_vat"] = [{}]
+
+    return payload
+
+
+def cleanPayload(payload: Dict, entities_to_remove: List) -> Dict:
+    for key in entities_to_remove:
+        payload.pop(key, None)
 
     return payload
 
@@ -93,14 +110,10 @@ def startConsuming(parameters, OCR, NLP):
     connection, channel = startConnection(parameters)
     for method_frame, properties, body in channel.consume("smart-invoice"):
 
-        try:
-            processResponse(body, method_frame, OCR, NLP)
-            channel.basic_ack(method_frame.delivery_tag)
-        except:
-            print("Failed to process image")
-            channel.basic_ack(method_frame.delivery_tag)
+        processResponse(body, method_frame, OCR, NLP)
+        channel.basic_ack(method_frame.delivery_tag)
 
-        if method_frame.delivery_tag == 100:
+        if method_frame.delivery_tag == 1:
             break
 
     requeued_messages = channel.cancel()
