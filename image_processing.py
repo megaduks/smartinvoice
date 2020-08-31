@@ -44,6 +44,7 @@ def correct_skew(image: np.ndarray, delta=0.05, limit=5) -> np.ndarray:
 def group_boxes(boxes: List[np.ndarray]) -> List[np.ndarray]:
     # sorting bounding boxes into lines of text, returns a list of a list of np.arrays
     # first, sorting from top to bottom
+
     boxes = sorted(boxes, key=lambda r: r[1])
     heights = []
     for box in boxes:
