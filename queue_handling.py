@@ -3,7 +3,7 @@ import json
 import spacy
 import cv2
 
-from settings import RABBITMQ_PASSWORD, RABBITMQ_LOGIN, RABBITMQ_SERVER, RABBITMQ_EXCHANGE_NAME
+from settings import RABBITMQ_PASSWORD, RABBITMQ_LOGIN, RABBITMQ_SERVER, RABBITMQ_EXCHANGE_NAME, INVOICE_NER_MODEL, INVOICE_EAST_MODEL
 from net_tools import send_json, get_image_from_token
 from image_processing import InvoiceOCR
 from classifiers import InvoiceNERClassifier
@@ -13,7 +13,6 @@ from pika import ConnectionParameters, PlainCredentials, BlockingConnection
 credentials = PlainCredentials(RABBITMQ_LOGIN, RABBITMQ_PASSWORD)
 connection_parameters = ConnectionParameters(host=RABBITMQ_SERVER, port=5672, virtual_host="/", credentials=credentials)
 exchange_name = RABBITMQ_EXCHANGE_NAME
-model = "/home/oliver/Documents/smartinvoice/experimental/prodigy/invoice_model_final/"
 
 
 def processResponse(response, method_frame, OCR, NER):
@@ -145,7 +144,7 @@ def start_consuming(parameters: ConnectionParameters, OCR: InvoiceOCR, NLP: Invo
 
 if __name__ == '__main__':
     get_queue_info(connection_parameters)
-    nlp = spacy.load(model)
+    nlp = spacy.load(INVOICE_NER_MODEL)
     clf = InvoiceNERClassifier(nlp=nlp)
-    OCR = InvoiceOCR(model_path="/home/oliver/Documents/smartinvoice/models/frozen_east_text_detection.pb")
+    OCR = InvoiceOCR(model_path=INVOICE_EAST_MODEL)
     start_consuming(connection_parameters, OCR, clf)

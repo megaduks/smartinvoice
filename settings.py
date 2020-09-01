@@ -20,9 +20,9 @@ RABBITMQ_PASSWORD = os.getenv("RABBITMQ_PASSWORD")
 RABBITMQ_SERVER = os.getenv("RABBITMQ_SERVER")
 RABBITMQ_EXCHANGE_NAME = os.getenv("EXCHANGE_NAME")
 
+INVOICE_EAST_MODEL = Path('/models/frozen_east_text_detection.pb')
 INVOICE_IMAGE_MODEL = Path('experimental/ludwig/invoice_photo/results/experiment_run_10/model')
 INVOICE_NER_MODEL = Path('experimental/prodigy/invoice_model_final')
-
 MODELS = {
     'NIP': {
         'model_path': 'models/nip_model',
