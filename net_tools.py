@@ -6,7 +6,7 @@ import cv2
 import json
 
 
-def sendJSON(payload: Dict, job_id: str, file_id: str) -> object:
+def send_json(payload: Dict, job_id: str, file_id: str) -> requests.request:
     # Takes in a dictionary, appends job and file id and  converts into json and sends to url.
     # Returns a request object with the return code and data.
 
@@ -22,12 +22,10 @@ def sendJSON(payload: Dict, job_id: str, file_id: str) -> object:
         print(err)
         print(response.text)
 
-    print(response)
-
     return response
 
 
-def getImageFromToken(token: str) -> np.ndarray:
+def get_image_from_token(token: str) -> np.ndarray:
     # Takes in the download token and requests the content from the B-MIND image host
 
     url = DOWNLOAD_URL + token
@@ -45,7 +43,7 @@ def getImageFromToken(token: str) -> np.ndarray:
 
     return image
 
-def generateTestJSON():
+def generate_test_json():
     with open("test.json") as f:
         data = json.load(f)
     return data
