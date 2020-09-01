@@ -146,5 +146,5 @@ if __name__ == '__main__':
     get_queue_info(connection_parameters)
     nlp = spacy.load(INVOICE_NER_MODEL)
     clf = InvoiceNERClassifier(nlp=nlp)
-    OCR = InvoiceOCR(model_path=INVOICE_EAST_MODEL)
+    OCR = InvoiceOCR(model_path=INVOICE_EAST_MODEL.as_posix())
     start_consuming(connection_parameters, OCR, clf)
