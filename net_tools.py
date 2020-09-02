@@ -43,8 +43,13 @@ def get_image_from_token(token: str) -> np.ndarray:
 
     return image
 
-def generate_test_json():
-    with open("test.json") as f:
+def load_schema():
+    with open("default.json") as f:
         data = json.load(f)
     return data
 
+if __name__ == '__main__':
+    data = {'numer_faktury': '', 'nip_sprzedawcy': '', 'typ_faktury': 'Faktura', 'razem_kwota_brutto': '30,13', 'rozliczenie_vat': [{'stawka_podatku': 0, 'wartosc_netto': 0, 'podatek': None, 'wartosc_brutto': 0}], 'data_sprzedazy': None, 'data_wystawienia': None, 'nazwa_sprzedawcy': None, 'nip_nabywcy': '699-174-30-00', 'nazwa_nabywcy': 'Biuro Rachunkowo-Finansowe Renata Szwarc', 'towary': [{'lp': None, 'nazwa': None, 'miara': None, 'ilosc': None, 'cena_jednostkowa': None, 'wartosc_netto': None, 'stawka_podatku': None, 'kwota_podatku': None, 'wartosc_brutto': None}], 'razem_kwota_netto': None, 'razem_kwota_podatku_vat': None, 'przedplata_kwota_netto': None, 'przedplata_kwota_brutto': None, 'przedplata_kwota_podatku_vat': None, 'czy_usluga': None, 'forma_platnosci': None, 'termin_platnosci': '21.05.2019', 'numer_konta_sprzedawcy': None, 'do_zaplaty': None, 'zaplacono': None, 'zaplacono_w_dniu': None, 'razem_do_zwrotu': None}
+
+    with open('data.json', 'w') as outfile:
+        json.dump(data, outfile)
