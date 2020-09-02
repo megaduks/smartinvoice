@@ -247,7 +247,7 @@ class InvoiceOCR:
 
 
 if __name__ == '__main__':
-    image = cv2.imread("1.png")
+    image = cv2.imread("test.png")
     OCR = InvoiceOCR(model_path="/home/oliver/Documents/smartinvoice/models/frozen_east_text_detection.pb")
     output = OCR.process_image(image)
     print(output)
