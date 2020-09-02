@@ -164,7 +164,6 @@ class InvoiceOCR:
 
         # rotate the image to correct skew
         image = correct_skew(image)
-
         orig = image.copy()
         (orig_img_height, orig_img_width) = image.shape[:2]
 
@@ -242,13 +241,13 @@ class InvoiceOCR:
         return OCR_text_output
         # save results to a .txt file:
 
-        #with open("test.txt", "w") as file:
+        # with open("test.txt", "w") as file:
         # for _, text in results:
          #     file.write(text)
 
 
 if __name__ == '__main__':
-    image = cv2.imread("test.png")
+    image = cv2.imread("1.png")
     OCR = InvoiceOCR(model_path="/home/oliver/Documents/smartinvoice/models/frozen_east_text_detection.pb")
     output = OCR.process_image(image)
     print(output)

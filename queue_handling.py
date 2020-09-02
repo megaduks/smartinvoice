@@ -4,7 +4,7 @@ import spacy
 import cv2
 
 from settings import RABBITMQ_PASSWORD, RABBITMQ_LOGIN, RABBITMQ_SERVER, RABBITMQ_EXCHANGE_NAME, INVOICE_NER_MODEL, INVOICE_EAST_MODEL
-from net_tools import send_json, get_image_from_token
+from net_tools import send_json, get_image_from_token, load_schema
 from image_processing import InvoiceOCR
 from classifiers import InvoiceNERClassifier
 from typing import Dict, List
@@ -34,57 +34,34 @@ def processResponse(response, method_frame, OCR, NER):
         print("[INFO] Processing OCR Output")
         ner_results = NER.predict(OCR_text_output)
 
-    payload = {}
+    payload = load_schema()
+    NER_output = {}
 
     for d in ner_results:
-        payload.update(d)
+        NER_output.update(d)
 
-    print(payload)
-    payload = update_payload(payload)
+    print(NER_output)
+    payload = update_payload(payload, NER_output)
     print(payload)
 
     print("[INFO] Sending JSON")
     send_json(payload=payload, job_id=data['job_id'], file_id=data['file_id'])
 
 
-def update_payload(payload: Dict) -> Dict:
+def update_payload(payload: Dict, dict_output: Dict) -> Dict:
 
-    payload["rozliczenie_vat"].append({"stawka_podatku": 0,
-                                       "wartosc_netto": 0,
-                                       "podatek": 0,
-                                       "wartosc_brutto": 0})
+    keys_tax = ['stawka_podatku', 'wartosc_netto', 'podatek', 'wartosc_brutto']
+    keys_product = ['lp', 'nazwa', 'miara', 'ilosc', 'cena_jednostkowa', 'wartosc_netto', 'stawka_podatku',
+                    'kwota_podatku', 'wartosc_brutto']
 
-    payload["towary"] = [{"lp": 0,
-                          "nazwa": "",
-                          "miara": "",
-                          "ilosc": "",
-                          "cena_jednostkowa": 0,
-                          "wartosc_netto": 0,
-                          "stawka_podatku": 0,
-                          "kwota_podatku": 0,
-                          "wartosc_brutto": 0}]
-
-    keys_tax = payload["towary"][0].keys() + payload["rozliczenie_vat"][0].keys()
-    keys_product = payload["towary"][0].keys()
-    keys_to_remove = keys_tax + keys_product
-
-    for key in payload.keys():
+    for key in dict_output.copy().keys():
         if key in keys_tax:
-            payload["rozliczenie_vat"][0][key] = payload[key]
+            payload["rozliczenie_vat"][0][key] = dict_output.pop(key, None)
 
         elif key in keys_product:
-            payload["rozliczenie_vat"][0][key] = payload[key]
+            payload["towary"][0][key] = dict_output.pop(key, None)
 
-    if "numer_faktury" not in payload.keys():
-        payload["numer_faktury"] = ""
-    if "nip_sprzedawcy" not in payload.keys():
-        payload["nip_sprzedawcy"] = ""
-    if "typ_faktury" not in payload.keys():
-        payload["typ_faktury"] = "faktura_vat"
-    if "razem_kwota_brutto" not in payload.keys():
-        payload["razem_kwota_brutto"] = 0
-
-    payload = clean_payload(payload, keys_to_remove)
+    payload.update(dict_output)
 
     return payload
 
@@ -132,7 +109,7 @@ def start_consuming(parameters: ConnectionParameters, OCR: InvoiceOCR, NLP: Invo
         processResponse(body, method_frame, OCR, NLP)
         channel.basic_ack(method_frame.delivery_tag)
 
-        if method_frame.delivery_tag == 1:
+        if method_frame.delivery_tag == 100:
             break
 
     requeued_messages = channel.cancel()
@@ -146,5 +123,5 @@ if __name__ == '__main__':
     get_queue_info(connection_parameters)
     nlp = spacy.load(INVOICE_NER_MODEL)
     clf = InvoiceNERClassifier(nlp=nlp)
-    OCR = InvoiceOCR(model_path=INVOICE_EAST_MODEL)
+    OCR = InvoiceOCR(model_path=INVOICE_EAST_MODEL.as_posix())
     start_consuming(connection_parameters, OCR, clf)
