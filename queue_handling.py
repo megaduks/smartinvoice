@@ -34,7 +34,7 @@ def processResponse(response, method_frame, OCR, NER):
         print("[INFO] Processing OCR Output")
         ner_results = NER.predict(OCR_text_output)
 
-    payload = load_schema()
+    payload = load_schema("default.json")
     NER_output = {}
 
     for d in ner_results:
