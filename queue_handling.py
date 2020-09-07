@@ -15,9 +15,19 @@ connection_parameters = ConnectionParameters(host=RABBITMQ_SERVER, port=5672, vi
 exchange_name = RABBITMQ_EXCHANGE_NAME
 
 
-def processResponse(response, method_frame, OCR, NER):
+def process_message(rabbit_task, method_frame, OCR: InvoiceOCR, NER: InvoiceNERClassifier):
 
-    data = json.loads(response.decode('utf-8'))
+    """
+
+    Processes a 
+    :param rabbit_task: 
+    :param method_frame: 
+    :param OCR: 
+    :param NER: 
+    :return: 
+    """
+
+    data = json.loads(rabbit_task.decode('utf-8'))
     print(f"Received message : {data}")
     print("[INFO] Downloading image.")
     image = get_image_from_token(data["download_token"])
@@ -49,6 +59,9 @@ def processResponse(response, method_frame, OCR, NER):
 
 
 def update_payload(payload: Dict, dict_output: Dict) -> Dict:
+    """
+    Updates payload with output from NER, formatted to fit the v0.5 schema
+    """
 
     keys_tax = ['stawka_podatku', 'wartosc_netto', 'podatek', 'wartosc_brutto']
     keys_product = ['lp', 'nazwa', 'miara', 'ilosc', 'cena_jednostkowa', 'wartosc_netto', 'stawka_podatku',
@@ -67,6 +80,9 @@ def update_payload(payload: Dict, dict_output: Dict) -> Dict:
 
 
 def clean_payload(payload: Dict, entities_to_remove: List) -> Dict:
+    """
+    Removes redundant data.
+    """""
     for key in entities_to_remove:
         payload.pop(key, None)
 
@@ -74,7 +90,10 @@ def clean_payload(payload: Dict, entities_to_remove: List) -> Dict:
 
 
 def test_connection(parameters: ConnectionParameters):
-    # try to establish connection and check its status
+    """
+    Tests connection with server, exits if none is established.
+    :param parameters: RABBITMQ connection parameters.
+    """
     try:
         connection = BlockingConnection(parameters)
         if connection.is_open:
@@ -87,29 +106,49 @@ def test_connection(parameters: ConnectionParameters):
 
 
 def start_connection(parameters: ConnectionParameters) -> (BlockingConnection, BlockingConnection):
+    """
+    Establishes connection with the queue, returns a BlockingConnection instance
+    :param parameters RABBITMQ connection parameters.
+    :return: BlockingConnection instance and it's channel for connection.
+
+    """
     connection = BlockingConnection(parameters)
     channel = connection.channel()
     return connection, channel
 
 
-def callback(channel, method_frame, properties, body, OCR):
+def callback(channel, method_frame, properties, body):
     pass
 
 
-def get_queue_info(parameters: ConnectionParameters):
+def get_queue_info(parameters: ConnectionParameters, queue="smart-invoice") -> object:
+    """
+    Checks if queue exists and returns it's info.
+    :param parameters: RABBITMQ connection parameters.
+    :param queue: Queue name.
+    """
     _, channel = start_connection(parameters)
-    print(channel.queue_declare(queue="smart-invoice", passive=True))
+    info = (channel.queue_declare(queue=queue, passive=True))
     channel.close()
+    return info
 
 
-def start_consuming(parameters: ConnectionParameters, OCR: InvoiceOCR, NLP: InvoiceNERClassifier):
+def start_consuming(parameters: ConnectionParameters, OCR: InvoiceOCR, NLP: InvoiceNERClassifier, message_limit=100):
+    """
+    Processes messages from queue, limited in amount of tasks processed.
+
+    :param parameters: RABBITMQ connection parameters.
+    :param OCR: OCR model for image processing.
+    :param NLP: NLP model for NER.
+    :param message_limit: Maximum number of processed messages.
+    """
     connection, channel = start_connection(parameters)
     for method_frame, properties, body in channel.consume("smart-invoice"):
 
-        processResponse(body, method_frame, OCR, NLP)
+        process_message(body, method_frame, OCR, NLP)
         channel.basic_ack(method_frame.delivery_tag)
 
-        if method_frame.delivery_tag == 100:
+        if method_frame.delivery_tag == message_limit:
             break
 
     requeued_messages = channel.cancel()
@@ -120,7 +159,7 @@ def start_consuming(parameters: ConnectionParameters, OCR: InvoiceOCR, NLP: Invo
 
 
 if __name__ == '__main__':
-    get_queue_info(connection_parameters)
+    print(get_queue_info(connection_parameters))
     nlp = spacy.load(INVOICE_NER_MODEL)
     clf = InvoiceNERClassifier(nlp=nlp)
     OCR = InvoiceOCR(model_path=INVOICE_EAST_MODEL.as_posix())

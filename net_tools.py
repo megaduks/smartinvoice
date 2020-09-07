@@ -7,26 +7,38 @@ import json
 
 
 def send_json(payload: Dict, job_id: str, file_id: str) -> requests.request:
-    # Takes in a dictionary, appends job and file id and  converts into json and sends to url.
-    # Returns a request object with the return code and data.
+    """
+    Takes in a dictionary, appends job and file id and  converts into json and sends to url.
+
+    :param payload : Data to be sent in python dictionary.
+    :param job_id: Job ID to be appended to data, required for sending.
+    :param file_id: File ID to be appended to data, required for sending.
+
+    :return requests.response: Response from the B-MIND app, 200 upon successful delivery.
+
+    """
 
     headers = {"X-ML-Signature": ML_SIGNATURE}
     payload['job_id'] = job_id
     payload['file_id'] = file_id
-
     try:
         response = requests.request(method="POST", url=UPLOAD_URL, json=payload, headers=headers)
         response.raise_for_status()
     except requests.exceptions.HTTPError as err:
         print("Failed to send")
         print(err)
-        print(response.text)
 
     return response
 
 
 def get_image_from_token(token: str) -> np.ndarray:
-    # Takes in the download token and requests the content from the B-MIND image host
+    """
+    Downloads image from B-MIND, requires unique token.
+    :param token: Download token.
+    :return n.ndarray: Download image in a numpy matrix, CV friendly.
+    :return None: If failed to download.
+
+    """
 
     url = DOWNLOAD_URL + token
     try:
@@ -43,11 +55,11 @@ def get_image_from_token(token: str) -> np.ndarray:
 
     return image
 
+
 def load_schema(filename: str) -> Dict:
+    """
+    Loads json from a file.
+    """
     with open(filename) as f:
         data = json.load(f)
     return data
-
-if __name__ == '__main__':
-    with open('data.json', 'w') as outfile:
-        json.dump(data, outfile)
