@@ -18,13 +18,13 @@ exchange_name = RABBITMQ_EXCHANGE_NAME
 def process_message(rabbit_task, method_frame, OCR: InvoiceOCR, NER: InvoiceNERClassifier):
 
     """
-
-    Processes a 
+    Processes a RABBITMQ task from queue, processes it through OCR and Ner,
+    output is formatted to fit the scheme and sent, image is saved. 
     :param rabbit_task: 
-    :param method_frame: 
-    :param OCR: 
-    :param NER: 
-    :return: 
+    :param method_frame: AMQP frame with RPC response.
+    :param OCR: Text detector and ocr.
+    :param NER: Ner Classifier
+
     """
 
     data = json.loads(rabbit_task.decode('utf-8'))
