@@ -280,8 +280,8 @@ for pathToImg in tqdm(args['image']):
 
             cv2.rectangle(output, (startX, startY), (endX, endY),
                           (0, 0, 255), 2)
-            #cv2.putText(output, clean_output(text), (startX, startY - 20),
-                        #cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3)
+            cv2.putText(output, clean_output(text), (endX, startY - 20),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 3)
 
             # show the output image
         cv2.imshow("Text Detection", output)
