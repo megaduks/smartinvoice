@@ -4,6 +4,7 @@ from settings import UPLOAD_URL, ML_SIGNATURE, DOWNLOAD_URL
 import numpy as np
 import cv2
 import json
+import logging
 
 
 def send_json(payload: Dict, job_id: str, file_id: str) -> requests.request:
@@ -21,12 +22,12 @@ def send_json(payload: Dict, job_id: str, file_id: str) -> requests.request:
     headers = {"X-ML-Signature": ML_SIGNATURE}
     payload['job_id'] = job_id
     payload['file_id'] = file_id
+
+    response = requests.request(method="POST", url=UPLOAD_URL, json=payload, headers=headers)
     try:
-        response = requests.request(method="POST", url=UPLOAD_URL, json=payload, headers=headers)
         response.raise_for_status()
     except requests.exceptions.HTTPError as err:
-        print("Failed to send")
-        print(err)
+        logging.error("Failed to send.", exc_info=True)
 
     return response
 
@@ -46,8 +47,7 @@ def get_image_from_token(token: str) -> np.ndarray:
         response.raise_for_status()
 
     except requests.exceptions.HTTPError as err:
-        print("Failed to download image:")
-        print(err)
+        logging.error("Failed to download image", exc_info=True)
         return None
 
     image = np.asarray(bytearray(response.raw.read()), dtype="uint8")

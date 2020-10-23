@@ -1,7 +1,7 @@
-
 import json
 import spacy
 import cv2
+import logging
 
 from settings import RABBITMQ_PASSWORD, RABBITMQ_LOGIN, RABBITMQ_SERVER, RABBITMQ_EXCHANGE_NAME, INVOICE_NER_MODEL, INVOICE_EAST_MODEL
 from net_tools import send_json, get_image_from_token, load_schema
@@ -13,13 +13,14 @@ from pika import ConnectionParameters, PlainCredentials, BlockingConnection
 credentials = PlainCredentials(RABBITMQ_LOGIN, RABBITMQ_PASSWORD)
 connection_parameters = ConnectionParameters(host=RABBITMQ_SERVER, port=5672, virtual_host="/", credentials=credentials)
 exchange_name = RABBITMQ_EXCHANGE_NAME
+logging.basicConfig(filemode='a', filename="queue_tasks.log", format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 
 def process_message(rabbit_task, method_frame, OCR: InvoiceOCR, NER: InvoiceNERClassifier):
 
     """
     Processes a RABBITMQ task from queue, processes it through OCR and Ner,
-    output is formatted to fit the scheme and sent, image is saved. 
+    output is formatted to fit the scheme and sent, image is saved.
     :param rabbit_task: 
     :param method_frame: AMQP frame with RPC response.
     :param OCR: Text detector and ocr.
@@ -28,20 +29,20 @@ def process_message(rabbit_task, method_frame, OCR: InvoiceOCR, NER: InvoiceNERC
     """
 
     data = json.loads(rabbit_task.decode('utf-8'))
-    print(f"Received message : {data}")
-    print("[INFO] Downloading image.")
+    logging.info(f"Received message : {data}")
+    logging.debug("Downloading image.")
     image = get_image_from_token(data["download_token"])
     ner_results = []
 
     # save image if download succeeds
     if image is not None:
-        filename = f"{method_frame.delivery_tag}.png"
+        filename = f"{data['file_id']}.png"
         cv2.imwrite(filename, image)
 
-        print("[INFO] Processing image")
-        OCR_text_output = OCR.process_image(image)
+        logging.info("[INFO] Processing image")
+        OCR_text_output, _ = OCR.process_image(image)
 
-        print("[INFO] Processing OCR Output")
+        logging.info("[INFO] Processing OCR Output")
         ner_results = NER.predict(OCR_text_output)
 
     payload = load_schema("default.json")
@@ -50,17 +51,18 @@ def process_message(rabbit_task, method_frame, OCR: InvoiceOCR, NER: InvoiceNERC
     for d in ner_results:
         NER_output.update(d)
 
-    print(NER_output)
+    logging.debug(NER_output)
     payload = update_payload(payload, NER_output)
-    print(payload)
+    logging.debug(payload)
 
-    print("[INFO] Sending JSON")
+    logging.info("Sending JSON")
     send_json(payload=payload, job_id=data['job_id'], file_id=data['file_id'])
 
 
 def update_payload(payload: Dict, dict_output: Dict) -> Dict:
     """
     Updates payload with output from NER, formatted to fit the v0.5 schema
+    :return Updated payload.
     """
 
     keys_tax = ['stawka_podatku', 'wartosc_netto', 'podatek', 'wartosc_brutto']
@@ -82,7 +84,7 @@ def update_payload(payload: Dict, dict_output: Dict) -> Dict:
 def clean_payload(payload: Dict, entities_to_remove: List) -> Dict:
     """
     Removes redundant data.
-    """""
+    """
     for key in entities_to_remove:
         payload.pop(key, None)
 
@@ -159,7 +161,7 @@ def start_consuming(parameters: ConnectionParameters, OCR: InvoiceOCR, NLP: Invo
 
 
 if __name__ == '__main__':
-    print(get_queue_info(connection_parameters))
+    logging.info(get_queue_info(connection_parameters))
     nlp = spacy.load(INVOICE_NER_MODEL)
     clf = InvoiceNERClassifier(nlp=nlp)
     OCR = InvoiceOCR(model_path=INVOICE_EAST_MODEL.as_posix())

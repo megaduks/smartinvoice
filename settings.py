@@ -9,7 +9,9 @@ load_dotenv()
 #OCR Parameters
 OCR_MIN_CONFIDENCE = 0.5
 OCR_PADDING = 0.1
-OCR_TESSERACT_CONFIG = "-l pol --oem 1  --psm 7"
+BC_PADDING = 0.1
+OCR_TESSERACT_CONFIG = "-l pol --oem 1  --psm 3"
+BC_OVERLAP_THRESHOLD = 0
 
 UPLOAD_URL = os.getenv("UPLOAD_URL")
 ML_SIGNATURE = os.getenv("ML_SIGNATURE")
