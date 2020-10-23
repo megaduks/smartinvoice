@@ -1,0 +1,76 @@
+Faktura VAT 
+Sprzedawca: 
+MORELE.NET sp. z 0.0. 
+nr FS-891/9/2014/DIR 
+nr FS- 
+2014-09-23 
+Data wystawienia: 
+Fabryczna 20A 
+1-553 Kraków 
+NIP: 9451972201 
+2014-09-23 
+Data dostawy/wykonania usługi: 
+ 
+ 
+0102033000061935248 
+Nr Tel: (012)418-40-25 
+Nr rejestrowy GIOŚ: E0004949ZBW 
+Strona: 1z 1 
+Bank: BRE Bank SA 1511402017-0000460202562536 
+Odbiorca: 
+Oddział Wielkopolski 
+Polskiego Towarzystwa Informatycznego 
+60-965 Poznań 
+Piotrowo 2 
+Nabywca: 
+Oddział Wielkopolski 
+Polskiego Towarzystwa Informatycznego 
+0-965 Poznań 
+Piotrowo 2 
+NIP: 5220002038 
+Zamówienia: ZS-22/9/2014/DIR[1477691] 
+Opis: Zamówienie numer 1477691 opis rezerwacji: OFKOD556658 
+Cena netto _ Wartość netto  4y,. 
+VAT 
+ 
+Kod 
+Lp. 
+Nazwa towaru 
+599216 8 SZT 
+Czytniki e-book [PocketBook ] PocketBook Mini szary + 600 ebooków za darmo! Szczegóły w opisie! 
+9999 
+ 
+PKWiU 
+Ilość/J.m. 
+l 684,55 
+210,57 
+23% 
+1545 
+ 
+SZT 
+23% 
+TRANSPORT KURIER 
+Kwota Waluta 
+Brutto 
+Netto 
+VAT 
+"Termin 
+Stawka 
+Forma płatności 
+2014-09-23 
+091,00 PLN Razem: 
+2091,00 
+391,00 
+1 700,00 
+przedpłata 
+2 091,00 
+1 700,00 391,00 
+Wtym: 23% 
+Razem do zapłaty: 2091,00 PLN 
+dwa tys. dziewięćdziesiąt jeden PLN 00/100 
+Zapłacono: 2091,00PLN Pozostaje do zapłaty: 0,00 PLN 
+Bartłomiej Gawłowicz 
+Potwierdzenie odbioru 
+Podpis osoby uprawnionej do wystawienia faktury 
+Dokument jest dowodem wydania towaru i zawarcia umowy kupna sprzedaży na zasadach opisanych w Regulaminie zakupów dostępnym na 
+www.morele.net 

@@ -1,0 +1,103 @@
+Faktura VAT 
+Te Sprzedawca 
+DEZERPNY TOSCA
+| GOSPODARSTW O ROLNE MARCIN K/ AMIŃSKI 
+| Kiedrowo 5 
+62-106 Rąbe zyn 
+61890046 
+FA/1/05/2019 
+2019-05-15 
+FPE/1/2019 
+2019-05-15 
+11 
+Data wystawienia. 
+Do dokumentu: 
+Wystawioncgo 
+Siwona: 
+Bank: SGB - BANK S.A. Nr rachunku: 52895900010012803630000010 
+Odbiorca: 
+PIIU Szwarc Wojciech Szwarc 
+Rakownia 
+ul. Zięby 4 
+2-095 Murowana Goślina 
+NIP: 7772144056 
+Nabywca: 
+PHU Szwarc Wojciech Szwarc 
+Rakownia 
+. Zięby 4 
+2-095 Murowana Goślina 
+NIP: 7772144056 
+Zaliczki otrzymano w dniach : 
+Wartość Vat 
+Zaliczka 
+VAT Wartość Netto 
+Lp. Nazwy towarów/usług, do których wpłacono zaliczki. 
+Kwill 
+78 750,00 
+3 750,00 
+75 000,00 
+Płody rolne zgodnie z umową 
+ 
+Brutto 
+750,04 
+78 750.00 
+VAT 
+3 750,00 
+3 750.00 
+Stawka 
+Razem: 
+tym: 5% 
+Netto 
+; 000,00 
+75 000,00 
+Kwota Waluta 
+s 750,00 BLN 
+Forma płatności 
+przelew 
+Termin 
+2019-05-15 
+Elementy faktury Proforma (zamówienia) 
+ 
+p Nazwa lowarwusługi 
+Cena netto VAT Wartość Netto 
+PR Will 
+Ilość 
+Wartość Brutto 
+Wartość Vat 
+Jm 
+Płody rolne z 
+750,00 
+podnie z umową 
+100 
+75 000,00 
+3 750,00 
+78 750,00 
+m 
+Stawka 
+ 
+tym; 5% 
+Netto 
+5 000,00 
+> 000,00 
+Brutto 
+78 750,00 
+78 750,00 
+VAT 
+3 750,00 
+3 750.00 
+Razem do zapłaty : 
+78 750,00 PLN 
+Słownie : s 
+e : siedemdziesiąt osiem 
+4l osiem tys. siedemset pięćdziesiąt PLN 00/100 
+Pozostaje do zapłaty: 78 750,00 
+Zapłacono: 0,00 PLN 
+PIN 
+Kamija W 
+h Wota 
+PRE ERC
+
+Podpis osoby uprąjyńiośiej do wystawienia faktury 
+Data odbioru 
+Podpis osoby upra 
+soby uprawmonej do odbioru faktury 
