@@ -1,20 +1,102 @@
 import cv2
 import numpy as np
 import pytesseract
+import argparse
+import os
 
-from pathlib import Path
+from tqdm import tqdm
 from scipy.ndimage import interpolation as inter
 from imutils.object_detection import non_max_suppression
-from typing import List
+from typing import List, Union
 
+from settings import BC_OVERLAP_THRESHOLD as OVERLAP_THRESHOLD
 from settings import OCR_MIN_CONFIDENCE as MIN_CONFIDENCE
-from settings import OCR_PADDING as PADDING
+from settings import BC_PADDING as BC_PADDING
+from settings import OCR_PADDING as OCR_PADDING
 from settings import OCR_TESSERACT_CONFIG as CONFIG
+from settings import INVOICE_EAST_MODEL as MODEL_PATH
 
 
-def correct_skew(image: np.ndarray, delta=0.05, limit=5) -> np.ndarray:
-    '''Corrects skew in test using the Projection Profile method, limited in maximum angle of skew,
-    delta determines step between angles checked'''
+class Graph:
+    """
+    Graph object for handling bounding box relations.
+    """
+
+    def __init__(self, V: int):
+        self.V = V
+        self.adj = [[] for _ in range(V)]
+
+    def DFSUtil(self, temp, vertex, visited):
+        """
+        Deep-first search algorithm for finding connected components.
+        """
+        visited[vertex] = True
+        temp.append(vertex)
+
+        for v in self.adj[vertex]:
+            if not visited[v]:
+                temp = self.DFSUtil(temp, v, visited)
+
+        return temp
+
+    def addEdge(self, v, w):
+        """
+        Method for adding undirected edges to the graph.
+        """
+        self.adj[v].append(w)
+        self.adj[w].append(v)
+
+    def connectedComponents(self) -> List[int]:
+
+        """
+        Method for finding connected components in an undirected graph.
+        :return List of indices of connected components.
+        """
+        visited = []
+        connected_components = []
+
+        for i in range(self.V):
+            visited.append(False)
+
+        for v in range(self.V):
+            if not visited[v]:
+                temp = []
+                connected_components.append(self.DFSUtil(temp, v, visited))
+
+        return connected_components
+
+
+def region_overlap_ratio(boxA: Union[np.ndarray], boxB: Union[np.ndarray]) -> float:
+    """
+    For calculating intersection of union of two bounding boxes.
+    """
+
+    xA = max(boxA[0], boxB[0])
+    yA = max(boxA[1], boxB[1])
+    xB = min(boxA[2], boxB[2])
+    yB = min(boxA[3], boxB[3])
+    interArea = max(0, xB - xA + 1) * max(0, yB - yA + 1)
+
+    boxAArea = (boxA[2] - boxA[0] + 1) * (boxA[3] - boxA[1] + 1)
+    boxBArea = (boxB[2] - boxB[0] + 1) * (boxB[3] - boxB[1] + 1)
+
+    iou = interArea / float(boxAArea + boxBArea - interArea)
+
+    return iou
+
+
+def is_inline(boxA: Union, boxB: Union, vertical_threshold: float) -> bool:
+    if abs(boxA[1] - boxB[1]) <= vertical_threshold and abs(boxA[3] - boxB[3]) <= vertical_threshold:
+        return True
+    else:
+        return False
+
+
+def correct_skew(image: np.ndarray, delta=0.5, limit=5) -> np.ndarray:
+    """
+    Corrects skew in test using the Projection Profile method, limited in maximum angle of skew,
+    delta determines step between angles checked.
+    """
 
     def determine_score(arr, angle):
         data = inter.rotate(arr, angle, reshape=False, order=0)
@@ -41,51 +123,79 @@ def correct_skew(image: np.ndarray, delta=0.05, limit=5) -> np.ndarray:
     return rotated
 
 
-def group_boxes(boxes: List[np.ndarray]) -> List[np.ndarray]:
-    # sorting bounding boxes into lines of text, returns a list of a list of np.arrays
-    # first, sorting from top to bottom
+merge_early = True
 
-    boxes = sorted(boxes, key=lambda r: r[1])
+
+def group_boxes(boxes: List[np.ndarray]) -> List[List[np.ndarray]]:
     heights = []
     for box in boxes:
-        heights.append(abs(box[1] - box[3]))
-    # getting the average height of the bounding boxes to approximate the height of single line of text
+        heights.append(abs(box[3] - box[1]))
     avgHeight = int(sum(heights) / len(heights))
-    # vertical_threshold to determine if a bounding box belongs to the same line
-    vertical_threshold = avgHeight / 2
-    horizontal_threshold = avgHeight * 10
-    groups = []
-    grouped_boxes = []
-    idx1 = 0
-    # clustering boxes of similar Y-value into subgroups
-    while idx1 < len(boxes) - 1:
-        sub_group = []
-        sub_group.append(boxes[idx1])
-        idx2 = idx1 + 1
-        while idx2 <= len(boxes) - 1:
-            if abs(boxes[idx2][1] - boxes[idx1][1]) <= vertical_threshold and \
-                    abs(boxes[idx2][3] - boxes[idx1][3]) <= vertical_threshold:
-                sub_group.append(boxes[idx2])
-                idx2 += 1
-            else:
-                break
-        idx1 = idx2
-        groups.append(sub_group)
 
-    # startX, startY, endX, endY
-    # creating a new box that contains the ones in the subgroup
-    for sub in groups:
-        startX = min([x[0] for x in sub])
-        startY = min([x[1] for x in sub])
-        endX = max([x[2] for x in sub])
-        endY = max([x[3] for x in sub])
-        grouped_boxes.append(np.asarray([startX, startY, endX, endY]))
+    # verticalThreshold to determine if a bounding box belongs to the same line
+    verticalThreshold = avgHeight / 4
+
+    # graph representation of overlap between bounding boxes
+    g = Graph(len(boxes))
+
+    # filling edges where overlap is sufficient
+    for boxA in range(len(boxes)):
+        for boxB in range(boxA + 1, len(boxes)):
+            if region_overlap_ratio(boxes[boxA], boxes[boxB]) > 0:
+                g.addEdge(boxA, boxB)
+
+    connected_components_idxs = g.connectedComponents()
+
+    grouped_boxes = []
+    for group in connected_components_idxs:
+        temp = []
+        for idx in group:
+            temp.append(boxes[idx])
+        grouped_boxes.append(temp)
+
+    if merge_early:
+        merged_boxes = []
+
+        for box in grouped_boxes:
+            startX = min([x[0] for x in box])
+            startY = min([x[1] for x in box])
+            endX = max([x[2] for x in box])
+            endY = max([x[3] for x in box])
+
+            merged_boxes.append(np.asarray([startX, startY, endX, endY]))
+
+        return merged_boxes
 
     return grouped_boxes
 
+def resize_image():
+    pass
 
-def decode_predictions(scores, geometry):
-    '''Process EAST output into relevant ROIs and their confidences'''
+def pad_boxes(boxes: List[np.ndarray], img_width, img_height) -> List[np.ndarray]:
+
+    padded_boxes = []
+    for (startX, startY, endX, endY) in boxes:
+
+        dX = int((endX - startX) * BC_PADDING)
+        dY = int((endY - startY) * BC_PADDING)
+
+        # apply padding to each side of the bounding box, respectively
+
+        padded_startX = max(0, startX - dX)
+        padded_startY = max(0, startY - dY)
+        padded_endX = min(img_width, endX + (dX * 2))
+        padded_endY = min(img_height, endY + (dY * 2))
+
+        padded_boxes.append((padded_startX, padded_startY, padded_endX, padded_endY))
+
+    return padded_boxes
+
+
+
+def decode_predictions(scores: List, geometry: List) -> Union:
+    """
+    Process EAST output into relevant ROIs and their confidences
+    """
 
     # grab the number of rows and columns from the scores volume, then
     # initialize our set of bounding box rectangles and corresponding
@@ -144,15 +254,17 @@ def decode_predictions(scores, geometry):
     return rectangles, confidences
 
 
-def clean_output(text : str) -> str:
-    # Remove non-ASCII characters from the input string
+def clean_output(text: str) -> str:
+    """
+    Remove non-ASCII characters from the input string.
+    """
     text = "".join([c if ord(c) < 128 else "" for c in text]).strip()
     return text
 
 
 class InvoiceOCR:
 
-    def __init__(self, model_path: str, img_width=1056, img_height=1920, ):
+    def __init__(self, model_path: str, img_width=1056, img_height=1920):
         self.img_width = img_width
         self.img_height = img_height
         self.layer_names = [
@@ -161,7 +273,6 @@ class InvoiceOCR:
         self.net = cv2.dnn.readNet(model_path)
 
     def process_image(self, image: np.ndarray):
-
         # rotate the image to correct skew
         image = correct_skew(image)
         orig = image.copy()
@@ -174,14 +285,14 @@ class InvoiceOCR:
         ratio_h = orig_img_height / float(new_img_height)
 
         # resize the image and grab the new image dimensions
-        image = cv2.resize(image, (new_img_width, new_img_height))
+        resized_image = cv2.resize(image, (new_img_width, new_img_height))
 
-        (img_height, image_width) = image.shape[:2]
+        (img_height, image_width) = resized_image.shape[:2]
 
         # construct a blob from the image and then perform a forward pass of
         # the model to obtain the two output layer sets
-        blob = cv2.dnn.blobFromImage(image, 1.0, (image_width, img_height),
-                                     (123.68, 116.78, 103.94), swapRB=True, crop=False)
+        blob = cv2.dnn.blobFromImage(resized_image, 1.0, (image_width, img_height),
+                                     (0, 0, 0), swapRB=True, crop=False)
         self.net.setInput(blob)
         (scores, geometry) = self.net.forward(self.layer_names)
 
@@ -190,10 +301,8 @@ class InvoiceOCR:
         (rectangles, confidences) = decode_predictions(scores, geometry)
         boxes = non_max_suppression(np.array(rectangles), probs=confidences)
         boxes = group_boxes(boxes)
-        # initialize the list of results
-        results = []
+        padded_boxes = []
 
-        # loop over the bounding boxes
         for (startX, startY, endX, endY) in boxes:
             # scale the bounding box coordinates based on the respective
             # ratios
@@ -205,16 +314,23 @@ class InvoiceOCR:
             # in order to obtain a better OCR of the text we can potentially
             # apply a bit of padding surrounding the bounding box -- here we
             # are computing the deltas in both the x and y directions
-            dX = int((endX - startX) * PADDING)
-            dY = int((endY - startY) * PADDING)
+            dX = int((endX - startX) * OCR_PADDING)
+            dY = int((endY - startY) * OCR_PADDING)
 
             # apply padding to each side of the bounding box, respectively
             startX = max(0, startX - dX)
             startY = max(0, startY - dY)
             endX = min(orig_img_width, endX + (dX * 2))
             endY = min(orig_img_height, endY + (dY * 2))
+            padded_boxes.append((startX, startY, endX, endY))
 
-            # extract the actual padded ROI
+        padded_boxes = group_boxes(padded_boxes)
+
+        padded_boxes = sorted(padded_boxes, key=lambda r: r[1])
+        results = []
+
+        for (startX, startY, endX, endY) in tqdm(padded_boxes):
+
             roi = orig[startY:endY, startX:endX]
 
             # in order to apply Tesseract v4 to OCR text we must supply
@@ -222,33 +338,53 @@ class InvoiceOCR:
             # wish to use the LSTM neural net model for OCR, and finally
             # (3) an OEM value, in this case, 7 which implies that we are
             # treating the ROI as a single line of text
-            text = pytesseract.image_to_string(roi, config=CONFIG)
-            # adding space to each output from tesseract
-            text += " "
 
-            # add the bounding box coordinates and OCR'd text to the list
-            # of results
-            #results.append(((startX, startY, endX, endY), text))
+            text = pytesseract.image_to_string(roi, config=CONFIG)
+
+            text += " \n"
             results.append(((startX, startY, endX, endY), text))
 
-        # sort the results bounding box coordinates from top to bottom:
-        results = sorted(results, key=lambda r: r[0][1])
-
-        OCR_text_output = ""
-        for _, text in results:
-            OCR_text_output += text
-
-        return OCR_text_output
-        # save results to a .txt file:
-
-        # with open("test.txt", "w") as file:
-        # for _, text in results:
-         #     file.write(text)
+        return results
 
 
 if __name__ == '__main__':
-    image = cv2.imread("test.png")
-    OCR = InvoiceOCR(model_path="/home/oliver/Documents/smartinvoice/models/frozen_east_text_detection.pb")
-    output = OCR.process_image(image)
-    print(output)
+    ap = argparse.ArgumentParser()
+    ap.add_argument("-i", "--image", nargs='+', default=[], type=str,
+                    help="path to input image")
+    ap.add_argument("-d", "--display", type=bool, default=False,
+                    help="whenever to display the test with bounding boxes")
+    args = vars(ap.parse_args())
 
+    merge_early = True
+
+    for pathToImg in tqdm(args['image']):
+
+        image = cv2.imread(pathToImg)
+        OCR = InvoiceOCR(model_path=MODEL_PATH.as_posix())
+        results = OCR.process_image(image)
+
+        base = os.path.basename(pathToImg)
+        imgName, ext = base.split(".")
+        with open(f"{imgName}.txt", "w") as file:
+            for _, text in results:
+                file.write(text)
+
+
+
+
+        output = image.copy()
+        i = 0
+        if args['display']:
+            for ((startX, startY, endX, endY), text) in results:
+                # using OpenCV, then draw the text and a bounding box surrounding
+                # the text region of the input image
+                i+=1
+                cv2.rectangle(output, (startX, startY), (endX, endY),
+                              (0, 0, 255), 2)
+                cv2.putText(output, clean_output(text), (startX, endY),
+                            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 3)
+
+                # show the output image
+            cv2.imshow("Text Detection", output)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()

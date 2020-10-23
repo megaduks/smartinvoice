@@ -92,7 +92,7 @@ def start_consuming(parameters: ConnectionParameters):
         processResponse(body, method_frame)
         channel.basic_ack(method_frame.delivery_tag)
 
-        if method_frame.delivery_tag == 1:
+        if method_frame.delivery_tag == 100:
             break
 
     requeued_messages = channel.cancel()
