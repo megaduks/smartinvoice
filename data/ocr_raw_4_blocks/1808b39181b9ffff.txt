@@ -1,0 +1,77 @@
+Wydruk Faktury 
+12/15/2014 
+Sprzedawca
+
+MORELE.NET Sp. z o.o.
+
+Radosław Stasiak, Michał Pawlik
+
+ul. Fabryczna 20A
+
+31-553 Kraków
+
+NIP: PL9451972201 Nr tel.: 0 801 000 861
+Multibank: 15 1140 2017 0000 4602 0256 2536 
+Faktura proforma 
+nr FPF/1492277/2014 
+Data wystawienia: 2014-12-15
+Data sprzedaży: 2014-12-15 
+ 
+Bank: Multibank - BRE Bank SA Nr rachunku: 15 1140 2017 0000 4602 0256 2536 
+Nabywca: 
+Odbiorca: 
+Oddział Wielkopolski Oddział Wielkopolski
+Polskiego Towarzystwa Informatycznego Polskiego Towarzystwa Informatycznego 
+Piotrowo 2
+60-965 Poznań
+NIP: 522-000-20-38 
+Piotrowo 2
+60-965 Poznań
+NIP: 522-000-20-38 
+Wartość 
+Cena 
+Ilość 
+VAT 
+Nazwa towaru/usługi 
+PKWiU 
+ 
+Lp. 
+netto 
+netto 
+Czytnik PocketBook Mini (PB515-Y-WW) 
+205,69 
+411,38 
+SZT. 
+23% 
+-Poczta Polska PŁATNE Z GÓRY NA
+KONTO (do 1kg) 
+11,79 
+11,79 
+SZT. 
+23% 
+Termin 
+VAT 
+Razem 
+Netto 
+Forma płatności 
+Brutto 
+Stawka 
+97,33 520,50 
+2014-09-29 16:00:00 RAZEM 
+423,1 
+23% 
+przelew 
+97,33 520,50 
+423,17 
+W tym 
+23% 
+Razem do zapłaty: 
+520,50PLN 
+Podpis osoby uprawnionej do
+
+wystawienia faktury 
+Podpis osoby uprawnionej do odbioru faktury 
+Data odbioru 
+Ewentualna róznica miedzy podana kwota brutto a kwota faktury VAT wynika z róznicy systemów zaokragleń (róznice groszowe) 
+1/1 
+http://www .morele.net/druk proformy/1492277/ 
