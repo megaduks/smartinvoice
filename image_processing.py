@@ -123,10 +123,7 @@ def correct_skew(image: np.ndarray, delta=0.5, limit=5) -> np.ndarray:
     return rotated
 
 
-merge_early = True
-
-
-def group_boxes(boxes: List[np.ndarray]) -> List[List[np.ndarray]]:
+def group_boxes(boxes: List[np.ndarray]) -> List[np.ndarray]:
     heights = []
     for box in boxes:
         heights.append(abs(box[3] - box[1]))
@@ -153,20 +150,85 @@ def group_boxes(boxes: List[np.ndarray]) -> List[List[np.ndarray]]:
             temp.append(boxes[idx])
         grouped_boxes.append(temp)
 
-    if merge_early:
-        merged_boxes = []
+    final = []
+    for group in grouped_boxes:
+        temp_g = Graph(len(group))
+        for boxA in range(len(group)):
+            for boxB in range(boxA + 1, len(group)):
+                if is_inline(group[boxA], group[boxB], verticalThreshold):
+                    temp_g.addEdge(boxA, boxB)
+        final_idx = temp_g.connectedComponents()
+        temp1 = []
+        for sub in final_idx:
+            temp = []
+            for idx in sub:
+                temp.append(group[idx])
+            temp1.append(temp)
 
-        for box in grouped_boxes:
-            startX = min([x[0] for x in box])
-            startY = min([x[1] for x in box])
-            endX = max([x[2] for x in box])
-            endY = max([x[3] for x in box])
+        final.append(temp1)
 
-            merged_boxes.append(np.asarray([startX, startY, endX, endY]))
+    final_merged = []
+    for block in final:
+        para = []
+        for line in block:
+            startX = min([x[0] for x in line])
+            startY = min([x[1] for x in line])
+            endX = max([x[2] for x in line])
+            endY = max([x[3] for x in line])
+            para.append((startX, startY, endX, endY))
+        para = sorted(para, key=lambda r: r[1])
+        final_merged.append(para)
 
-        return merged_boxes
+    final_merged = sorted(final_merged, key=lambda r: r[0][1])
 
-    return grouped_boxes
+    flat = []
+    for box in final_merged:
+        for line in box:
+            flat.append(line)
+
+    return flat
+
+
+def group_boxes_blocks(boxes: List[np.ndarray]) -> List[List[np.ndarray]]:
+    heights = []
+    for box in boxes:
+        heights.append(abs(box[3] - box[1]))
+    avgHeight = int(sum(heights) / len(heights))
+
+    # verticalThreshold to determine if a bounding box belongs to the same line
+    verticalThreshold = avgHeight / 4
+
+    # graph representation of overlap between bounding boxes
+    g = Graph(len(boxes))
+
+    # filling edges where overlap is sufficient
+    for boxA in range(len(boxes)):
+        for boxB in range(boxA + 1, len(boxes)):
+            if region_overlap_ratio(boxes[boxA], boxes[boxB]) > 0:
+                g.addEdge(boxA, boxB)
+
+    connected_components_idxs = g.connectedComponents()
+
+    grouped_boxes = []
+    for group in connected_components_idxs:
+        temp = []
+        for idx in group:
+            temp.append(boxes[idx])
+        grouped_boxes.append(temp)
+
+
+    merged_boxes = []
+
+    for box in grouped_boxes:
+        startX = min([x[0] for x in box])
+        startY = min([x[1] for x in box])
+        endX = max([x[2] for x in box])
+        endY = max([x[3] for x in box])
+
+        merged_boxes.append(np.asarray([startX, startY, endX, endY]))
+
+    return merged_boxes
+
 
 def resize_image():
     pass
@@ -325,8 +387,6 @@ class InvoiceOCR:
             padded_boxes.append((startX, startY, endX, endY))
 
         padded_boxes = group_boxes(padded_boxes)
-
-        padded_boxes = sorted(padded_boxes, key=lambda r: r[1])
         results = []
 
         for (startX, startY, endX, endY) in tqdm(padded_boxes):
@@ -373,16 +433,16 @@ if __name__ == '__main__':
 
 
         output = image.copy()
-        i = 0
+
         if args['display']:
             for ((startX, startY, endX, endY), text) in results:
                 # using OpenCV, then draw the text and a bounding box surrounding
                 # the text region of the input image
-                i+=1
+
                 cv2.rectangle(output, (startX, startY), (endX, endY),
                               (0, 0, 255), 2)
                 cv2.putText(output, clean_output(text), (startX, endY),
-                            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 3)
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 3)
 
                 # show the output image
             cv2.imshow("Text Detection", output)

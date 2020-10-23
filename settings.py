@@ -8,7 +8,7 @@ load_dotenv()
 
 #OCR Parameters
 OCR_MIN_CONFIDENCE = 0.5
-OCR_PADDING = 0.1
+OCR_PADDING = 0.2
 BC_PADDING = 0.1
 OCR_TESSERACT_CONFIG = "-l pol --oem 1  --psm 3"
 BC_OVERLAP_THRESHOLD = 0
