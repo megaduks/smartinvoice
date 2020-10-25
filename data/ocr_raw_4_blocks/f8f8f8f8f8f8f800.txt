@@ -1,0 +1,67 @@
+Invoice 129/2019 
+Sprzedawca
+PHU Szwarc Wojciech Szwarc
+ul. Zięby 4, Rakownia
+62-095 Murowana Goślina
+NIP; PL 7772144056 
+09.2019 
+Data wystawienia: 
+ 
+Strona: 
+Bank: SGB - BANK S.A. Nr rachunku: 31 8669 0001 2003 0034 8346 0002 
+Kod SWIFT: GBWCPLPP 
+Odbiorca: 
+Nabywca: 
+OU LATTER NT 
+OU LATTER NT 
+Pikk Ambla 37B 
+Pikk Ambla 37B
+76502 Jarvamaa
+NIP: EE 100787605 
+76502 Jarvamaa
+NIP: EE 100787605 
+| Lp. Nazwa towaru/usługi
+
+1  AGRI-3034-8Foot Fenght 
+Wartość netto [EUR] | 
+Cena netto[EUR] 
+VAT 
+PKWiU 
+Ilość 
+J.m. 
+710szt 
+? 608,00 
+0% 
+1,8000 
+Transport Costs 
+742,00 
+742,00 
+0% 
+1szt 
+Forma płatności 
+Termin 
+ 
+_ Netto[EUR]
+18 350,00
+18 350,00 
+ 
+_Brutto[EUR]
+
+18 350,00
+
+18 350,00 
+17.09.2019 > 
+payment after prepayment 
+tym:| 0% 
+Value invoice after prepeyment: 12 845,00 EUR 
+fRazem do zapłaty 
+18350,00 EUR
+
+Słownie : osiemnaście tys. trzysta pięćdziesiąt EUR 00/100 
+Renata Szwarc 
+Podpis osoby uprawnionej do wystawienia faktury 
+Data odbioru 
+Podpis osoby uprawnionej do odbioru faktury 
+ 
+Comarch ERP Optima, v. 2019.3.1.1520, i 
+klucza 5000033587 

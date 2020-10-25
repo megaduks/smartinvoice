@@ -1,0 +1,58 @@
+[ Sprzedawca 
+| AIDEM ART Sp. zo.o. 
+ 
+nr FV/94/11/2018 
+ul. 27 Grudnia 9a/l 
+61-737 Poznań 
+ 
+www.aidemart.pl 
+Bank: Alior Bank S.A. Nr rachunku: 17 2490 0005 0000 4530 6017 3823 
+2018-11-23 
+2018-11-23 
+Strona: 14 
+Data wystawienia 
+Data dostawy / wykonania usługi: 
+Nabywca: 
+Biuro Rachunkowo-Finansowe Renata Szware 
+Rakownia 
+1. Zięby 4 
+62-095 Murowana Goślina 
+NIP: 6991743000 
+ 
+Biuro Rachunkowo-Finansowe Renata Szwarc 
+Rakownia 
+1. Zięby 4 
+62-095 Murowana Goślina 
+NIP: 6991743000 
+ 
+Nazwa towarufusługi 
+Usługa informatyczna (poza abonamentem) 
+ 
+przelew_ALIOR 2018-11-30 
+PKWiU Ilość. J 
+ 
+358,00 
+ 
+ 
+440,34 
+179,00 
+ 
+ 
+440,34 PLN 
+23% 
+ 
+358,00 
+358,00 
+ 
+Z RPO TU pROY OSR OWZVZ PA RWŃ
+Słownie : czterysta czterdzieści PLN 34/100 
+Pozostaje do zapłaty: 440,34 PLN 
+'Razem.do zapł. 
+Zapłacono: 0,00 PLN 
+Maciej Firsowicz 
+Podpis osoby uprawnionej do odbioru faklury 
+Podpis osoby uprawnionej do wystawienia faktury 
+ 
+Data odbioru. 
+Comarch ERP Oplima, v. 2018.6.1.1650, nr klucza 2006223137 
+(ny) 

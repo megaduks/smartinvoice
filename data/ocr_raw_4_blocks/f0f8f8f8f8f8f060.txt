@@ -1,0 +1,66 @@
+Faktura Pro Forma 
+Sprzedawca
+GOSPODARSTWO ROLNE MARCIN 
+KAMIŃSKI 
+nr FPF/1/2019 
+Kicdrowo 5
+62-106 Rąbczyn
+
+NIP: 7661890046 
+2019-05-15 
+Jata wystawienia: 
+ 
+Strona. 
+Nr rachunku: 52895900010012803630000010 
+Bank: SGB - BANK S.A 
+Odbiorca: 
+Nabywca: 
+PIIU Szwarc Wojciech Szwarc 
+PHU Szwarc Wojciech Szwarc 
+Rakownia 
+Rakownia 
+„/ięby 4 
+ul. Zięby 4 
+62-095 Murowana Goślina
+NIP: 7772144056 
+62-095 Murowana Goślina
+NIP: 7772144056 
+Lp. Nazwa towaru/usługi 
+Wartość netto 
+VAT 
+PKWiU 
+Ilość 
+Cena netto 
+ 
+Płody rolne zgodnie z umow 
+006,00 
+750.00 
+100 
+Stawka
+Razem: 
+VAT 
+Forma płatności 
+Brutto 
+Termin 
+Netto
+75 000,00
+75 000,00 
+750,00 
+78 750,00 
+przelew 
+019-05-2 
+78 750,00 
+750,00 
+tym: 
+5% 
+Razem do zapłaty 
+78 750,00 PLN
+
+Słownie demset Pięćdziesiąt PLN 007100
+
+: siedemdziesiąt osiem tys, sie 
+Kamila Wota 
+Podpis osoby uprawnionej d 
+wystawienia faktury 
+Data odbioru 
+Podpis osoby uprawnionej do odbioru faktury 
