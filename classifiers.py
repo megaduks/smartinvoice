@@ -1,15 +1,16 @@
 import spacy
 import plac
-import pandas as pd
+import json
+import logging
 
 from spacy.language import Language
-from tokenizers import create_custom_tokenizer
 from matchers import remove_REGON_token
-from typing import Dict, List
+from typing import Dict, List, Optional, Union
 from pathlib import Path
-from ludwig.api import LudwigModel
+from itertools import chain
 
-from settings import MODELS, INVOICE_NER_MODEL
+# from ludwig.api import LudwigModel
+# import pandas as pd
 
 Language.factories['remove_REGON_token'] = remove_REGON_token
 
@@ -44,50 +45,22 @@ json2ner = {
 }
 
 
-class InvoicePhotoClassifier:
-
-    def __init__(self, model_path: Path):
-        self.model = LudwigModel.load(model_path)
-
-    def predict(self, image_file: Path) -> bool:
-        """Verifies if the photo contains an image of an invoice"""
-        df = pd.DataFrame(
-            {
-                'image_path': [image_file]
-            }
-        )
-        prediction = self.model.predict(data_df=df)
-
-        return prediction.class_predictions[0] == 'invoice'
-
-
-class InvoiceClassifier:
-
-    def __init__(self):
-        self.models = {}
-
-    def fit(self, document: str, models: List[str] = None) -> Dict:
-        """Applies models to the raw document to extract NERs"""
-
-        RESULT = dict()
-
-        models = MODELS if not models else models
-
-        for model in models:
-            if model not in self.models:
-                nlp = spacy.load(MODELS[model]['model_path'])
-                nlp.tokenizer = create_custom_tokenizer(nlp)
-                nlp.add_pipe(remove_REGON_token, after='ner')
-
-                self.models[model] = nlp
-
-            doc = self.models[model](document)
-
-            if model in [e.label_ for e in doc.ents]:
-                RESULT.update({model: [doc[e.start:e.end] for e in doc.ents if e.label_ == model]})
-
-        return RESULT
-
+# class InvoicePhotoClassifier:
+#
+#     def __init__(self, model_path: Path):
+#         self.model = LudwigModel.load(model_path)
+#
+#     def predict(self, image_file: Path) -> bool:
+#         """Verifies if the photo contains an image of an invoice"""
+#         df = pd.DataFrame(
+#             {
+#                 'image_path': [image_file]
+#             }
+#         )
+#         prediction = self.model.predict(data_df=df)
+#
+#         return prediction.class_predictions[0] == 'invoice'
+#
 
 class InvoiceNERClassifier:
 
@@ -107,7 +80,7 @@ class InvoiceNERClassifier:
                 token
                 for token in label.split()
                 if not token.startswith('xxx')
-                and not token in tokens_to_strip
+                   and token not in tokens_to_strip
             ]
             return ' '.join(clean_label)
 
@@ -115,41 +88,98 @@ class InvoiceNERClassifier:
 
         for ent in doc.ents:
             ent_value = strip_ent_labels(doc[ent.start:ent.end].text)
-
-            # some entity labels (e.g. ADDRESS_SELLER) are not required and included in the ner2json map
-            try:
-                RESULT.append({ner2json[ent.label_]: ent_value})
-            except KeyError:
-                pass
+            RESULT.append({ent.label_: ent_value})
 
         return RESULT
 
 
-def process_invoice(input_file: Path) -> List:
-    """Extracts NERs from OCR file and returns a dictionary"""
-    nlp = spacy.load(INVOICE_NER_MODEL)
-    clf = InvoiceNERClassifier(nlp=nlp)
-
-    with open(input_file, 'rt') as f:
-        return clf.predict(f.readline())
-
-
 @plac.annotations(
     input_dir=("Input directory", "option", "i", Path),
+    output_dir=("Output directory", "option", "o", Path),
     model=("Directory with invoice entity recognizer model", "option", "m", Path)
 )
-def main(input_dir: Path, model: Path):
+def main(input_dir: Path, output_dir: Path, model: Path):
+    """Helper function to find the entity value from the list of dictionaries with discovered entities"""
+
+    FORMAT = "%(levelname)-5s %(asctime)-15s %(message)s"
+    logging.basicConfig(format=FORMAT, level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
+    logging.getLogger().setLevel(logging.INFO)
+    logging.info('Extracting NERs from OCR files')
+
+    def get_entity(lst: List[Dict], key: str, default: Union[str, bool] = None) -> Optional:
+        value = default
+        for k, v in chain.from_iterable(d.items() for d in lst):
+            if k == key:
+                value = v
+        return value
+
     """Loads the model, set up the pipeline and train the entity recognizer."""
+    logging.info('Loading language model')
     nlp = spacy.load(model)
     clf = InvoiceNERClassifier(nlp=nlp)
 
     input_files = input_dir.glob('*.txt')
 
+    logging.info('Processing OCR files')
     for input_file in input_files:
-        with open(input_file, 'rt') as f:
-            print(f"{input_file} : {clf.predict(f.readline())}")
+        with open(input_file, 'r', encoding='utf-8') as f:
+            entities = clf.predict(f.readline())
+
+            answer = {
+                'numer_faktury': get_entity(entities, 'INVOICE_NO'),
+                'typ_faktury': get_entity(entities, 'INVOICE_TYPE'),
+                'data_sprzedazy': get_entity(entities, 'PURCHASE_DATE'),
+                'data_wystawienia': get_entity(entities, 'ISSUE_DATE'),
+                'nip_sprzedawcy': get_entity(entities, 'NIP_SELLER'),
+                'nazwa_sprzedawcy': None,
+                'nip_nabywcy': get_entity(entities, 'NIP_BUYER'),
+                'nazwa_nabywcy': None,
+                'towary': [
+                    {
+                        'lp': None,
+                        'nazwa': get_entity(entities, 'PRODUCT_NAME'),
+                        'miara': get_entity(entities, 'MEASURE_PRODUCT'),
+                        'ilosc': get_entity(entities, 'QTY_PRODUCT'),
+                        'cena_jednostkowa': get_entity(entities, 'UNIT_PRICE'),
+                        'wartosc_netto': get_entity(entities, 'NET_AMOUNT_PRODUCT'),
+                        'stawka_podatku': get_entity(entities, 'TAX_RATE_PRODUCT'),
+                        'kwota_podatku': get_entity(entities, 'TAX_AMOUNT_PRODUCT'),
+                        'wartosc_brutto': get_entity(entities, 'GROSS_AMOUNT_PRODUCT')
+                    }
+                ],
+                'razem_kwota_netto': get_entity(entities, 'NET_AMOUNT_TOTAL'),
+                'razem_kwota_brutto': get_entity(entities, 'GROSS_AMOUNT_TOTAL'),
+                'razem_kwota_podatku_vat': get_entity(entities, 'TAX_AMOUNT_TOTAL'),
+                'przedplata_kwota_netto': None,
+                'przedplata_kwota_brutto': None,
+                'przedplata_kwota_podatku_vat': None,
+                'rozliczenie_vat': [
+                    {
+                        'stawka_podatku': get_entity(entities, 'TAX_RATE_PRODUCT'),
+                        'wartosc_netto': get_entity(entities, 'NET_AMOUNT_TOTAL'),
+                        'podatek': get_entity(entities, 'TAX_AMOUNT_TOTAL'),
+                        'wartosc_brutto': get_entity(entities, 'GROSS_AMOUNT_TOTAL')
+                    }
+                ],
+                'czy_usluga': False,
+                'forma_platnosci': get_entity(entities, 'PAYMENT_FORM'),
+                'termin_platnosci': get_entity(entities, 'PAYMENT_DUE'),
+                'numer_konta_sprzedawcy': get_entity(entities, 'BANK_ACCOUNT_NO'),
+                'do_zaplaty': None,
+                'zaplacono': None,
+                'zaplacono_w_dniu': None,
+                'razem_do_zwrotu': None,
+                'faktura_zaliczkowa': {
+                    'data': None,
+                    'numer': None,
+                    'wartosc': None
+                }
+            }
+
+            output_file = output_dir / f"{input_file.stem}.json"
+            with open(output_file, 'w') as o:
+                json.dump(answer, o)
 
 
 if __name__ == '__main__':
-
     plac.call(main)

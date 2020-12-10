@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import List
 from settings import MODELS
 
+
 @plac.annotations(
     input_dir=("Input directory with text files", "option", "i", Path),
     matchers=("Comma-separated list of matchers to be applied", "option", "m", str)
@@ -31,5 +32,4 @@ def main(input_dir: Path, matchers: List[str]) -> None:
 
 
 if __name__ == '__main__':
-
     plac.call(main)

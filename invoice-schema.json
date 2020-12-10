@@ -60,27 +60,27 @@
         },
         "razem_kwota_netto": {
             "description": "Sumaryczna należność netto za całą fakturę",
-            "type": "number"
+            "type": "string"
         },
         "razem_kwota_brutto": {
             "description": "Sumaryczna należność brutto za całą fakturę",
-            "type": "number"
+            "type": "string"
         },
         "razem_kwota_podatku_vat": {
             "description": "Sumaryczna wartość naliczonego podatku VAT",
-            "type": "number"
+            "type": "string"
         },
         "przedplata_kwota_netto": {
             "description": "Sumaryczna przedpłata netto za całą fakturę",
-            "type": "number"
+            "type": "string"
         },
         "przedplata_kwota_brutto": {
             "description": "Sumaryczna przedpłata brutto za całą fakturę",
-            "type": "number"
+            "type": "string"
         },
         "przedplata_kwota_podatku_vat": {
             "description": "Sumaryczna przedpłata naliczonego podatku VAT",
-            "type": "number"
+            "type": "string"
         },
         "rozliczenie_vat": {
             "description": "Rozbicie kwot netto i brutto na poszczególne stawki podatkowe",
@@ -88,10 +88,10 @@
             "items": {
                 "type": "object",
                 "properties": {
-                    "stawka_podatku": { "type": "string", "enum": ["0", "4", "5", "7", "8", "23", "NP", "ZW"] },
-                    "wartosc_netto": { "type": "number" },
-                    "podatek": { "type": "number" },
-                    "wartosc_brutto": { "type": "number" }
+                    "stawka_podatku": { "type": "string"},
+                    "wartosc_netto": { "type": "string" },
+                    "podatek": { "type": "string" },
+                    "wartosc_brutto": { "type": "string" }
                 }
             }
         },
@@ -101,8 +101,7 @@
         },
         "forma_platnosci": {
             "description": "Jaka forma płatności jest przewidziana?",
-            "type": "string",
-            "enum": ["przelew", "gotówka", "karta płatnicza", "barter", "czek", "weksel", "za pobraniem", "kompensata", "akredytywa", "PayPal", "PayU", "inny" ]
+            "type": "string"
         },
         "termin_platnosci": {
             "description": "Termin płatności w przypadku przelewu",
@@ -114,11 +113,11 @@
         },
         "do_zaplaty": {
             "description": "Sumaryczna kwota jaka pozostała do zapłaty",
-            "type": "number"
+            "type": "string"
         },
         "zaplacono": {
             "description": "Kwota która została zapłacona jako zaliczka",
-            "type": "number"
+            "type": "string"
         },
         "zaplacono_w_dniu": {
             "description": "Data, kiedy nastąpiła płatność faktury",
@@ -126,15 +125,15 @@
         },
         "razem_do_zwrotu": {
             "description": "Kwota wynikająca z różnicy między zaliczką/przedpłatą a kwotą na fakturze",
-            "type": "number"
+            "type": "string"
         },
         "faktura_zaliczkowa": {
             "description": "Informacje o fakturze zaliczkowej z którą jest związana dana faktura VAT",
             "type": "object",
             "properties": {
                 "data": { "type": "string" },
-                "numer": { "type": "number" },
-                "wartosc": { "type": "number" }
+                "numer": { "type": "string" },
+                "wartosc": { "type": "string" }
             }
         }
     },

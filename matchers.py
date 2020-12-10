@@ -186,16 +186,16 @@ class MoneyMatcher(InvoiceMatcher):
         super(MoneyMatcher, self).__init__(nlp, label='money')
         patterns = [
             [
-                {'POS': 'NUM'}, {'LOWER': 'zł'}
+                {'POS': 'NUM'}, {'IS_PUNCT': True}, {'POS': 'NUM'}, {'LOWER': 'zł'}
             ],
             [
-                {'POS': 'NUM'}, {'LOWER': 'zl'}
+                {'POS': 'NUM'}, {'IS_PUNCT': True}, {'POS': 'NUM'}, {'LOWER': 'zl'}
             ],
             [
-                {'POS': 'NUM'}, {'LOWER': 'pln'}
+                {'POS': 'NUM'}, {'IS_PUNCT': True}, {'POS': 'NUM'}, {'LOWER': 'pln'}
             ],
             [
-                {'POS': 'NUM'}, {'ENT_TYPE': "MONEY"}
+                {'POS': 'NUM'}, {'IS_PUNCT': True}, {'POS': 'NUM'}, {'ENT_TYPE': "MONEY"}
             ],
         ]
         self.matcher.add(self.label, None, *patterns)
