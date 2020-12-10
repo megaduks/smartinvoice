@@ -88,7 +88,7 @@
             "items": {
                 "type": "object",
                 "properties": {
-                    "stawka_podatku": { "type": "string", "enum": ["0", "4", "5", "7", "8", "23", "NP", "ZW"] },
+                    "stawka_podatku": { "type": "string"},
                     "wartosc_netto": { "type": "string" },
                     "podatek": { "type": "string" },
                     "wartosc_brutto": { "type": "string" }
