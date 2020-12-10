@@ -1,6 +1,7 @@
 import spacy
 import plac
 import json
+import logging
 
 from spacy.language import Language
 from matchers import remove_REGON_token
@@ -10,8 +11,6 @@ from itertools import chain
 
 # from ludwig.api import LudwigModel
 # import pandas as pd
-
-from settings import INVOICE_NER_MODEL
 
 Language.factories['remove_REGON_token'] = remove_REGON_token
 
@@ -102,6 +101,11 @@ class InvoiceNERClassifier:
 def main(input_dir: Path, output_dir: Path, model: Path):
     """Helper function to find the entity value from the list of dictionaries with discovered entities"""
 
+    FORMAT = "%(levelname)-5s %(asctime)-15s %(message)s"
+    logging.basicConfig(format=FORMAT, level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
+    logging.getLogger().setLevel(logging.INFO)
+    logging.info('Extracting NERs from OCR files')
+
     def get_entity(lst: List[Dict], key: str, default: Union[str, bool] = None) -> Optional:
         value = default
         for k, v in chain.from_iterable(d.items() for d in lst):
@@ -110,11 +114,13 @@ def main(input_dir: Path, output_dir: Path, model: Path):
         return value
 
     """Loads the model, set up the pipeline and train the entity recognizer."""
+    logging.info('Loading language model')
     nlp = spacy.load(model)
     clf = InvoiceNERClassifier(nlp=nlp)
 
     input_files = input_dir.glob('*.txt')
 
+    logging.info('Processing OCR files')
     for input_file in input_files:
         with open(input_file, 'r', encoding='utf-8') as f:
             entities = clf.predict(f.readline())
