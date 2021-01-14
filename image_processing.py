@@ -94,7 +94,7 @@ def is_inline(boxA: Union, boxB: Union, vertical_threshold: float) -> bool:
 
 def correct_skew(image: np.ndarray, delta=0.5, limit=5) -> np.ndarray:
     """
-    Corrects skew in test using the Projection Profile method, limited in maximum angle of skew,
+    Corrects skew in text using the Projection Profile method, limited in maximum angle of skew,
     delta determines step between angles checked.
     """
 
