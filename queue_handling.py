@@ -41,11 +41,12 @@ def process_message(rabbit_task, method_frame, OCR: InvoiceOCR, NER: InvoiceNERC
 
         logging.info("[INFO] Processing image")
         OCR_text_output, _ = OCR.process_image(image)
+        print(OCR_text_output)
 
         logging.info("[INFO] Processing OCR Output")
         ner_results = NER.predict(OCR_text_output)
 
-    payload = load_schema("default.json")
+    payload = load_schema("utils/default.json")
     NER_output = {}
 
     for d in ner_results:

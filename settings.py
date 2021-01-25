@@ -8,10 +8,11 @@ load_dotenv()
 
 #OCR Parameters
 OCR_MIN_CONFIDENCE = 0.5
-OCR_PADDING = 0.2
+OCR_PADDING = 0.15
 BC_PADDING = 0.1
-OCR_TESSERACT_CONFIG = "-l pol --oem 1  --psm 3"
 BC_OVERLAP_THRESHOLD = 0
+            
+OCR_TESSERACT_CONFIG = "-l pol --oem 3  --psm 6"
 
 UPLOAD_URL = os.getenv("UPLOAD_URL")
 ML_SIGNATURE = os.getenv("ML_SIGNATURE")
@@ -22,7 +23,7 @@ RABBITMQ_PASSWORD = os.getenv("RABBITMQ_PASSWORD")
 RABBITMQ_SERVER = os.getenv("RABBITMQ_SERVER")
 RABBITMQ_EXCHANGE_NAME = os.getenv("EXCHANGE_NAME")
 
-INVOICE_EAST_MODEL = Path('models/frozen_east_text_detection.pb')
+INVOICE_EAST_MODEL = Path('models/frozen_EAST.pb')
 INVOICE_IMAGE_MODEL = Path('experimental/ludwig/invoice_photo/results/experiment_run_10/model')
 INVOICE_NER_MODEL = Path('experimental/prodigy/invoice_model_final')
 MODELS = {

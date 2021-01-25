@@ -112,3 +112,5 @@ __pycache__/
 .env
 
 .idea/inspectionProfiles/
+utils/.vscode/settings.json
+logs
