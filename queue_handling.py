@@ -135,7 +135,7 @@ def get_queue_info(parameters: ConnectionParameters, queue="smart-invoice") -> o
     return info
 
 
-def start_consuming(parameters: ConnectionParameters, OCR: InvoiceOCR, NLP: InvoiceNERClassifier, message_limit=100):
+def start_consuming(parameters: ConnectionParameters, OCR: InvoiceOCR, NLP: InvoiceNERClassifier, message_limit=1):
     """
     Processes messages from queue, limited in amount of tasks processed.
 

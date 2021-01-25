@@ -445,6 +445,5 @@ if __name__ == '__main__':
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 3)
 
                 # show the output image
-            cv2.imshow("Text Detection", output)
-            cv2.waitKey(0)
-            cv2.destroyAllWindows()
+            cv2.imwrite("out.jpg", output)
+
