@@ -4,14 +4,12 @@ import pytesseract
 import argparse
 import os
 
-from tqdm import tqdm
 from scipy.ndimage import interpolation as inter
 from imutils.object_detection import non_max_suppression
-from typing import List, Union
+from typing import List, Union, Tuple
 
 from settings import BC_OVERLAP_THRESHOLD as OVERLAP_THRESHOLD
 from settings import OCR_MIN_CONFIDENCE as MIN_CONFIDENCE
-from settings import BC_PADDING as BC_PADDING
 from settings import OCR_PADDING as OCR_PADDING
 from settings import OCR_TESSERACT_CONFIG as CONFIG
 from settings import INVOICE_EAST_MODEL as MODEL_PATH
@@ -86,6 +84,9 @@ def region_overlap_ratio(boxA: Union[np.ndarray], boxB: Union[np.ndarray]) -> fl
 
 
 def is_inline(boxA: Union, boxB: Union, vertical_threshold: float) -> bool:
+    """
+    Check if two bounding boxes belong to the roughly same line. 
+    """
     if abs(boxA[1] - boxB[1]) <= vertical_threshold and abs(boxA[3] - boxB[3]) <= vertical_threshold:
         return True
     else:
@@ -124,6 +125,13 @@ def correct_skew(image: np.ndarray, delta=0.5, limit=5) -> np.ndarray:
 
 
 def group_boxes(boxes: List[np.ndarray]) -> List[np.ndarray]:
+    """
+    Method for grouping bounding boxes by their position on the page, BBs are joined into blocks if they overlap
+    then any boxes belonging to the same line are merged.
+
+    :param boxes: List of bounding boxes to be sorted and grouped into blocks.
+    :return: Sorted list of bounding boxes.
+    """
     heights = []
     for box in boxes:
         heights.append(abs(box[3] - box[1]))
@@ -133,16 +141,17 @@ def group_boxes(boxes: List[np.ndarray]) -> List[np.ndarray]:
     verticalThreshold = avgHeight / 4
 
     # graph representation of overlap between bounding boxes
-    g = Graph(len(boxes))
+    overlap_graph = Graph(len(boxes))
 
     # filling edges where overlap is sufficient
     for boxA in range(len(boxes)):
         for boxB in range(boxA + 1, len(boxes)):
-            if region_overlap_ratio(boxes[boxA], boxes[boxB]) > 0:
-                g.addEdge(boxA, boxB)
+            if region_overlap_ratio(boxes[boxA], boxes[boxB]) > OVERLAP_THRESHOLD:
+                overlap_graph.addEdge(boxA, boxB)
 
-    connected_components_idxs = g.connectedComponents()
+    connected_components_idxs = overlap_graph.connectedComponents()
 
+    # separating boxes into groups based on overlap between them
     grouped_boxes = []
     for group in connected_components_idxs:
         temp = []
@@ -152,22 +161,26 @@ def group_boxes(boxes: List[np.ndarray]) -> List[np.ndarray]:
 
     final = []
     for group in grouped_boxes:
-        temp_g = Graph(len(group))
+
+        # creating a graph where individual text boxes belonging to the same line are matched together
+        inline_graph = Graph(len(group))
         for boxA in range(len(group)):
             for boxB in range(boxA + 1, len(group)):
                 if is_inline(group[boxA], group[boxB], verticalThreshold):
-                    temp_g.addEdge(boxA, boxB)
-        final_idx = temp_g.connectedComponents()
-        temp1 = []
+                    inline_graph.addEdge(boxA, boxB)
+        final_idx = inline_graph.connectedComponents()
+        single_line = []
+
         for sub in final_idx:
             temp = []
             for idx in sub:
                 temp.append(group[idx])
-            temp1.append(temp)
+            single_line.append(temp)
 
-        final.append(temp1)
+        final.append(single_line)
 
     final_merged = []
+    # merging boxes into lines
     for block in final:
         para = []
         for line in block:
@@ -179,8 +192,10 @@ def group_boxes(boxes: List[np.ndarray]) -> List[np.ndarray]:
         para = sorted(para, key=lambda r: r[1])
         final_merged.append(para)
 
+    # Sorting all text groupings by the Y position in the page of the first element
     final_merged = sorted(final_merged, key=lambda r: r[0][1])
 
+    # Creating a single list with all the new bounding boxes in a new order
     flat = []
     for box in final_merged:
         for line in box:
@@ -189,7 +204,14 @@ def group_boxes(boxes: List[np.ndarray]) -> List[np.ndarray]:
     return flat
 
 
-def group_boxes_blocks(boxes: List[np.ndarray]) -> List[List[np.ndarray]]:
+def group_boxes_blocks(boxes: List[np.ndarray]) -> List[np.ndarray]:
+    """
+    Method for grouping bounding boxes by their position on the page,
+     BBs are joined into blocks and merged into one containing the whole block.
+
+    :param boxes: List of bounding boxes to be sorted and grouped into blocks.
+    :return: Sorted list of bounding boxes.
+    """
     heights = []
     for box in boxes:
         heights.append(abs(box[3] - box[1]))
@@ -215,7 +237,6 @@ def group_boxes_blocks(boxes: List[np.ndarray]) -> List[List[np.ndarray]]:
         for idx in group:
             temp.append(boxes[idx])
         grouped_boxes.append(temp)
-
 
     merged_boxes = []
 
@@ -230,33 +251,9 @@ def group_boxes_blocks(boxes: List[np.ndarray]) -> List[List[np.ndarray]]:
     return merged_boxes
 
 
-def resize_image():
-    pass
-
-def pad_boxes(boxes: List[np.ndarray], img_width, img_height) -> List[np.ndarray]:
-
-    padded_boxes = []
-    for (startX, startY, endX, endY) in boxes:
-
-        dX = int((endX - startX) * BC_PADDING)
-        dY = int((endY - startY) * BC_PADDING)
-
-        # apply padding to each side of the bounding box, respectively
-
-        padded_startX = max(0, startX - dX)
-        padded_startY = max(0, startY - dY)
-        padded_endX = min(img_width, endX + (dX * 2))
-        padded_endY = min(img_height, endY + (dY * 2))
-
-        padded_boxes.append((padded_startX, padded_startY, padded_endX, padded_endY))
-
-    return padded_boxes
-
-
-
 def decode_predictions(scores: List, geometry: List) -> Union:
     """
-    Process EAST output into relevant ROIs and their confidences
+    Process EAST output into relevant ROIs and their confidences.
     """
 
     # grab the number of rows and columns from the scores volume, then
@@ -332,7 +329,7 @@ class InvoiceOCR:
         self.layer_names = [
             "feature_fusion/Conv_7/Sigmoid",
             "feature_fusion/concat_3"]
-        self.net = cv2.dnn.readNet(model_path)
+        self.net = cv2.dnn.readNet(model=model_path)
 
     def process_image(self, image: np.ndarray):
         # rotate the image to correct skew
@@ -354,7 +351,7 @@ class InvoiceOCR:
         # construct a blob from the image and then perform a forward pass of
         # the model to obtain the two output layer sets
         blob = cv2.dnn.blobFromImage(resized_image, 1.0, (image_width, img_height),
-                                     (0, 0, 0), swapRB=True, crop=False)
+                                     (123.68, 116.78, 103.94), swapRB=True, crop=False)
         self.net.setInput(blob)
         (scores, geometry) = self.net.forward(self.layer_names)
 
@@ -362,7 +359,7 @@ class InvoiceOCR:
         # suppress weak, overlapping bounding boxes
         (rectangles, confidences) = decode_predictions(scores, geometry)
         boxes = non_max_suppression(np.array(rectangles), probs=confidences)
-        boxes = group_boxes(boxes)
+        # boxes = group_boxes(boxes)
         padded_boxes = []
 
         for (startX, startY, endX, endY) in boxes:
@@ -388,23 +385,16 @@ class InvoiceOCR:
 
         padded_boxes = group_boxes(padded_boxes)
         results = []
-
-        for (startX, startY, endX, endY) in tqdm(padded_boxes):
-
+        text = ""
+        for (startX, startY, endX, endY) in padded_boxes:
             roi = orig[startY:endY, startX:endX]
 
-            # in order to apply Tesseract v4 to OCR text we must supply
-            # (1) a language, (2) an OEM flag of 4, indicating that the we
-            # wish to use the LSTM neural net model for OCR, and finally
-            # (3) an OEM value, in this case, 7 which implies that we are
-            # treating the ROI as a single line of text
+            text_output = pytesseract.image_to_string(roi, config=CONFIG)
+            print(text_output)
+            text += text_output + " "
+            results.append(((startX, startY, endX, endY), text_output))
 
-            text = pytesseract.image_to_string(roi, config=CONFIG)
-
-            text += " \n"
-            results.append(((startX, startY, endX, endY), text))
-
-        return results
+        return results, text
 
 
 if __name__ == '__main__':
@@ -417,33 +407,29 @@ if __name__ == '__main__':
 
     merge_early = True
 
-    for pathToImg in tqdm(args['image']):
+    for pathToImg in args['image']:
 
         image = cv2.imread(pathToImg)
         OCR = InvoiceOCR(model_path=MODEL_PATH.as_posix())
-        results = OCR.process_image(image)
+        results, OCR_text = OCR.process_image(image)
 
         base = os.path.basename(pathToImg)
         imgName, ext = base.split(".")
         with open(f"{imgName}.txt", "w") as file:
-            for _, text in results:
-                file.write(text)
-
-
-
+            file.write(OCR_text)
 
         output = image.copy()
 
         if args['display']:
+            i = 1
             for ((startX, startY, endX, endY), text) in results:
                 # using OpenCV, then draw the text and a bounding box surrounding
                 # the text region of the input image
 
                 cv2.rectangle(output, (startX, startY), (endX, endY),
                               (0, 0, 255), 2)
-                cv2.putText(output, clean_output(text), (startX, endY),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 3)
-
+                cv2.putText(output, f"{clean_output(text)}   {i}", (startX, endY),
+                            cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 3)
+                i += 1
                 # show the output image
-            cv2.imwrite("out.jpg", output)
-
+            cv2.imwrite(f"{imgName}.jpg", output)
