@@ -2,7 +2,7 @@ import json
 import cv2
 
 from settings import RABBITMQ_PASSWORD, RABBITMQ_LOGIN, RABBITMQ_SERVER, RABBITMQ_EXCHANGE_NAME
-from net_tools import send_json, get_image_from_token, load_schema
+from queue_tools import send_json, get_image_from_token, load_schema
 
 from typing import Dict, List
 from pika import ConnectionParameters, PlainCredentials, BlockingConnection
@@ -92,7 +92,7 @@ def start_consuming(parameters: ConnectionParameters):
         processResponse(body, method_frame)
         channel.basic_ack(method_frame.delivery_tag)
 
-        if method_frame.delivery_tag == 1:
+        if method_frame.delivery_tag == 0:
             break
 
     requeued_messages = channel.cancel()

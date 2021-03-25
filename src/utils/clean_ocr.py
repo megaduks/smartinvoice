@@ -5,7 +5,6 @@ import logging
 from pathlib import Path
 from typing import List
 from settings import MODELS
-
 from tokenizers import create_custom_tokenizer
 
 
@@ -66,6 +65,51 @@ def main(input_dir: Path, output_dir: Path, matchers: List[str]) -> None:
     for i, input_file in enumerate(input_files):
         output_file = output_dir / input_file.name
         output_file.write_text(RESULTS[i].text)
+
+
+def clean_ocr(raw_ocr: str, matchers: List[str], nlp) -> str:
+    """Applies matchers to a set of text files in a directory"""
+
+    FORMAT = "%(levelname)-5s %(asctime)-15s %(message)s"
+    logging.basicConfig(format=FORMAT, level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
+    logging.getLogger().setLevel(logging.INFO)
+    logging.info('Cleaning raw OCR files')
+    matchers = ["NIP", "BANK_ACCOUNT_NO", "REGON", "INVOICE_NUMBER", "GROSS_VALUE", "DATE"]
+
+    nlp.tokenizer = create_custom_tokenizer(nlp=nlp)
+
+    DOCS = []
+    RESULTS = []
+    BAD_CHARACTERS = list('!#^&*()+{}[]|?<>=\x0c')
+
+    DOCS.append(raw_ocr)
+
+    logging.info('Loading matchers')
+    for matcher in matchers:
+        matcher = MODELS[matcher]['matcher_factory'](nlp)
+        nlp.add_pipe(matcher, after='parser')
+
+    logging.info('Injecting matched entities')
+    for doc in nlp.pipe(DOCS):
+
+        _text = doc.text
+        offset = 0
+
+        for e in doc.ents:
+            if e.label_ != 'date':
+                injection = f' xxx{e.label_} '
+                _text = _text[:e.start_char + offset] + injection + _text[e.start_char + offset:]
+                offset += len(injection)
+
+        for c in BAD_CHARACTERS:
+            _text = _text.replace(c, '')
+
+        new_doc = nlp.make_doc(_text)
+        RESULTS.append(new_doc)
+
+    clean_text = RESULTS[0].text
+
+    return clean_text
 
 
 if __name__ == '__main__':

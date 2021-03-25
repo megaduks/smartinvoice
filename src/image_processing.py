@@ -8,6 +8,7 @@ from scipy.ndimage import interpolation as inter
 from imutils.object_detection import non_max_suppression
 from typing import List, Union, Tuple
 
+from settings import BC_PADDING
 from settings import BC_OVERLAP_THRESHOLD as OVERLAP_THRESHOLD
 from settings import OCR_MIN_CONFIDENCE as MIN_CONFIDENCE
 from settings import OCR_PADDING as OCR_PADDING
@@ -64,10 +65,27 @@ class Graph:
         return connected_components
 
 
+def apply_padding(box: Union[np.ndarray], padding) -> Union[int]:
+    start_x, start_y, end_x, end_y = box
+
+    # smaller padding for horizontal values to enforce grouping by position in y axis
+    d_x = 0.5 * int((end_x - start_x) * padding)
+    d_y = int((end_y - start_y) * padding)
+
+    start_x = max(0, start_x - d_x)
+    start_y = max(0, start_y - d_y)
+    end_x = end_x + d_x
+    end_y = end_y + d_y
+
+    return start_x, start_y, end_x, end_y
+
+
 def region_overlap_ratio(boxA: Union[np.ndarray], boxB: Union[np.ndarray]) -> float:
     """
     For calculating intersection of union of two bounding boxes.
     """
+    boxA = apply_padding(boxA, padding=BC_PADDING)
+    boxB = apply_padding(boxB, padding=BC_PADDING)
 
     xA = max(boxA[0], boxB[0])
     yA = max(boxA[1], boxB[1])
@@ -124,7 +142,7 @@ def correct_skew(image: np.ndarray, delta=0.5, limit=5) -> np.ndarray:
     return rotated
 
 
-def group_boxes(boxes: List[np.ndarray]) -> List[np.ndarray]:
+def group_boxes(boxes: object) -> object:
     """
     Method for grouping bounding boxes by their position on the page, BBs are joined into blocks if they overlap
     then any boxes belonging to the same line are merged.
@@ -138,7 +156,7 @@ def group_boxes(boxes: List[np.ndarray]) -> List[np.ndarray]:
     avgHeight = int(sum(heights) / len(heights))
 
     # verticalThreshold to determine if a bounding box belongs to the same line
-    verticalThreshold = avgHeight / 4
+    verticalThreshold = avgHeight / 2
 
     # graph representation of overlap between bounding boxes
     overlap_graph = Graph(len(boxes))
@@ -362,37 +380,36 @@ class InvoiceOCR:
         # boxes = group_boxes(boxes)
         padded_boxes = []
 
-        for (startX, startY, endX, endY) in boxes:
+        for (start_x, start_y, end_x, end_y) in boxes:
             # scale the bounding box coordinates based on the respective
             # ratios
-            startX = int(startX * ratio_w)
-            startY = int(startY * ratio_h)
-            endX = int(endX * ratio_w)
-            endY = int(endY * ratio_h)
+            start_x = int(start_x * ratio_w)
+            start_y = int(start_y * ratio_h)
+            end_x = int(end_x * ratio_w)
+            end_y = int(end_y * ratio_h)
 
             # in order to obtain a better OCR of the text we can potentially
             # apply a bit of padding surrounding the bounding box -- here we
             # are computing the deltas in both the x and y directions
-            dX = int((endX - startX) * OCR_PADDING)
-            dY = int((endY - startY) * OCR_PADDING)
+            d_x = int((end_x - start_x) * OCR_PADDING)
+            d_y = int((end_y - start_y) * OCR_PADDING)
 
             # apply padding to each side of the bounding box, respectively
-            startX = max(0, startX - dX)
-            startY = max(0, startY - dY)
-            endX = min(orig_img_width, endX + (dX * 2))
-            endY = min(orig_img_height, endY + (dY * 2))
-            padded_boxes.append((startX, startY, endX, endY))
+            start_x = max(0, start_x - d_x)
+            start_y = max(0, start_y - d_y)
+            end_x = min(orig_img_width, end_x + d_x)
+            end_y = min(orig_img_height, end_y + (d_y * 2))
+            padded_boxes.append((start_x, start_y, end_x, end_y))
 
         padded_boxes = group_boxes(padded_boxes)
         results = []
         text = ""
-        for (startX, startY, endX, endY) in padded_boxes:
-            roi = orig[startY:endY, startX:endX]
+        for (start_x, start_y, end_x, end_y) in padded_boxes:
+            roi = orig[start_y:end_y, start_x:end_x]
 
             text_output = pytesseract.image_to_string(roi, config=CONFIG)
-            print(text_output)
-            text += text_output + " "
-            results.append(((startX, startY, endX, endY), text_output))
+            text += text_output
+            results.append(((start_x, start_y, end_x, end_y), text_output))
 
         return results, text
 
@@ -407,15 +424,15 @@ if __name__ == '__main__':
 
     merge_early = True
 
-    for pathToImg in args['image']:
+    for path_to_image in args['image']:
 
-        image = cv2.imread(pathToImg)
+        image = cv2.imread(path_to_image)
         OCR = InvoiceOCR(model_path=MODEL_PATH.as_posix())
         results, OCR_text = OCR.process_image(image)
 
-        base = os.path.basename(pathToImg)
-        imgName, ext = base.split(".")
-        with open(f"{imgName}.txt", "w") as file:
+        base = os.path.basename(path_to_image)
+        image_name, ext = base.split(".")
+        with open(f"{image_name}1.txt", "w") as file:
             file.write(OCR_text)
 
         output = image.copy()
@@ -428,8 +445,8 @@ if __name__ == '__main__':
 
                 cv2.rectangle(output, (startX, startY), (endX, endY),
                               (0, 0, 255), 2)
-                cv2.putText(output, f"{clean_output(text)}   {i}", (startX, endY),
-                            cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 3)
+                cv2.putText(output, f"{i}", (startX, startY),
+                            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 1)
                 i += 1
-                # show the output image
-            cv2.imwrite(f"{imgName}.jpg", output)
+                # save the output image
+            cv2.imwrite(f"{image_name}.jpg", output)

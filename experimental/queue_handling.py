@@ -3,17 +3,19 @@ import spacy
 import cv2
 import logging
 
-from settings import RABBITMQ_PASSWORD, RABBITMQ_LOGIN, RABBITMQ_SERVER, RABBITMQ_EXCHANGE_NAME, INVOICE_NER_MODEL, INVOICE_EAST_MODEL
-from net_tools import send_json, get_image_from_token, load_schema
+from settings import RABBITMQ_PASSWORD, RABBITMQ_LOGIN, RABBITMQ_SERVER, RABBITMQ_EXCHANGE_NAME, INVOICE_NER_MODEL, \
+    INVOICE_EAST_MODEL, RABBITMQ_PORT, RABBITMQ_VIRTUAL_HOST
+from queue_tools import send_json, get_image_from_token, load_schema
 from image_processing import InvoiceOCR
 from classifiers import InvoiceNERClassifier
 from typing import Dict, List
 from pika import ConnectionParameters, PlainCredentials, BlockingConnection
 
+
 credentials = PlainCredentials(RABBITMQ_LOGIN, RABBITMQ_PASSWORD)
-connection_parameters = ConnectionParameters(host=RABBITMQ_SERVER, port=5672, virtual_host="/", credentials=credentials)
+connection_parameters = ConnectionParameters(host=RABBITMQ_SERVER, port=RABBITMQ_PORT, virtual_host="/", credentials=credentials)
 exchange_name = RABBITMQ_EXCHANGE_NAME
-logging.basicConfig(filemode='a', filename="queue_tasks.log", format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
+logging.basicConfig(filemode='a', filename="../src/queue_tasks.log", format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 
 def process_message(rabbit_task, method_frame, OCR: InvoiceOCR, NER: InvoiceNERClassifier):
@@ -25,7 +27,7 @@ def process_message(rabbit_task, method_frame, OCR: InvoiceOCR, NER: InvoiceNERC
     :param method_frame: AMQP frame with RPC response.
     :param OCR: Text detector and ocr.
     :param NER: Ner Classifier
-
+v
     """
 
     data = json.loads(rabbit_task.decode('utf-8'))
@@ -40,8 +42,7 @@ def process_message(rabbit_task, method_frame, OCR: InvoiceOCR, NER: InvoiceNERC
         cv2.imwrite(filename, image)
 
         logging.info("[INFO] Processing image")
-        OCR_text_output, _ = OCR.process_image(image)
-        print(OCR_text_output)
+        _, OCR_text_output = OCR.process_image(image)
 
         logging.info("[INFO] Processing OCR Output")
         ner_results = NER.predict(OCR_text_output)
@@ -119,6 +120,17 @@ def start_connection(parameters: ConnectionParameters) -> (BlockingConnection, B
     channel = connection.channel()
     return connection, channel
 
+def start_connection(parameters: ConnectionParameters) -> (BlockingConnection, BlockingConnection):
+    """
+    Establishes connection with the queue, returns a BlockingConnection instance
+    :param parameters RABBITMQ connection parameters.
+    :return: BlockingConnection instance and it's channel for connection.
+
+    """
+    connection = BlockingConnection(parameters)
+    channel = connection.channel()
+    return connection, channel
+
 
 def callback(channel, method_frame, properties, body):
     pass
@@ -136,19 +148,19 @@ def get_queue_info(parameters: ConnectionParameters, queue="smart-invoice") -> o
     return info
 
 
-def start_consuming(parameters: ConnectionParameters, OCR: InvoiceOCR, NLP: InvoiceNERClassifier, message_limit=1):
+def start_consuming(parameters: ConnectionParameters, ocr: InvoiceOCR, nlp: InvoiceNERClassifier, message_limit=1):
     """
     Processes messages from queue, limited in amount of tasks processed.
 
     :param parameters: RABBITMQ connection parameters.
-    :param OCR: OCR model for image processing.
-    :param NLP: NLP model for NER.
+    :param ocr: OCR model for image processing.
+    :param nlp: NLP model for NER.
     :param message_limit: Maximum number of processed messages.
     """
     connection, channel = start_connection(parameters)
     for method_frame, properties, body in channel.consume("smart-invoice"):
 
-        process_message(body, method_frame, OCR, NLP)
+        process_message(body, method_frame, ocr, nlp)
         channel.basic_ack(method_frame.delivery_tag)
 
         if method_frame.delivery_tag == message_limit:
@@ -159,11 +171,3 @@ def start_consuming(parameters: ConnectionParameters, OCR: InvoiceOCR, NLP: Invo
 
     channel.close()
     connection.close()
-
-
-if __name__ == '__main__':
-    logging.info(get_queue_info(connection_parameters))
-    nlp = spacy.load(INVOICE_NER_MODEL)
-    clf = InvoiceNERClassifier(nlp=nlp)
-    OCR = InvoiceOCR(model_path=INVOICE_EAST_MODEL.as_posix())
-    start_consuming(connection_parameters, OCR, clf)
