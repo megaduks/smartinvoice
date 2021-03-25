@@ -108,11 +108,12 @@ fabric.properties
 __pycache__/
 
 # Env file with  sensitive login data
-
 .env
 
+# VScode settings
 .idea/inspectionProfiles/
 utils/.vscode/settings.json
-logs
-
 src/utils/.vscode/
+
+#
+/src/logs/

@@ -30,6 +30,7 @@ INVOICE_IMAGE_MODEL = Path('experimental/ludwig/invoice_photo/results/experiment
 INVOICE_NER_MODEL = Path('models/invoice_final_ner_model')
 
 MATCHERS = ["NIP", "BANK_ACCOUNT_NO", "REGON", "INVOICE_NUMBER", "GROSS_VALUE", "DATE"]
+LOG_DIRECTORY = "./logs/"
 
 MODELS = {
     'NIP': {

@@ -9,11 +9,18 @@ from matchers import remove_REGON_token
 from typing import Dict, List, Optional, Union
 from pathlib import Path
 from itertools import chain
-from settings import INVOICE_NER_MODEL
+from settings import INVOICE_NER_MODEL, LOG_DIRECTORY
 from utils import clean_ocr
 
 # from ludwig.api import LudwigModel
 # import pandas as pd
+
+LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(logging.INFO)
+
+file_handler = logging.FileHandler(f'{LOG_DIRECTORY}classifier.log')
+file_handler.setFormatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+LOGGER.addHandler(file_handler)
 
 Language.factories['remove_REGON_token'] = remove_REGON_token
 
@@ -77,6 +84,7 @@ json2ner = {
 class InvoiceTextClassifier:
 
     def __init__(self, model_path: str):
+        LOGGER.info("Loading language models.")
         self.nlp = spacy.load(model_path)
         self.nlp_clean = spacy.load('pl_core_news_lg')
         self.matchers = MATCHERS
@@ -100,6 +108,7 @@ class InvoiceTextClassifier:
             ]
             return ' '.join(clean_label)
 
+        LOGGER.info('Processing OCR files')
         doc = self.nlp(clean_document)
 
         for ent in doc.ents:
@@ -280,4 +289,7 @@ def main(input_dir: Path, output_dir: Path, model: Path):
 
 
 if __name__ == '__main__':
-    plac.call(main)
+    print(MATCHERS)
+    nlp = InvoiceTextClassifier(model_path=INVOICE_NER_MODEL)
+
+    # plac.call(main)
