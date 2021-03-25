@@ -8,8 +8,8 @@ import logging
 from classifiers import InvoiceTextClassifier
 from image_processing import InvoiceOCR
 from pika import ConnectionParameters, PlainCredentials, BlockingConnection
-from settings import UPLOAD_URL, ML_SIGNATURE, DOWNLOAD_URL
-from settings import RABBITMQ_PASSWORD, RABBITMQ_LOGIN, RABBITMQ_SERVER, RABBITMQ_EXCHANGE_NAME, INVOICE_NER_MODEL, \
+from settings import UPLOAD_URL, ML_SIGNATURE, DOWNLOAD_URL, LOG_DIRECTORY
+from settings import RABBITMQ_PASSWORD, RABBITMQ_LOGIN, RABBITMQ_SERVER, RABBITMQ_QUEUE_NAME, INVOICE_NER_MODEL, \
     INVOICE_EAST_MODEL, RABBITMQ_PORT
 
 
@@ -125,7 +125,7 @@ class Consumer(object):
         Processes a RABBITMQ task from queue, passes it through OCR and Ner,
         output is formatted to fit the scheme and sent.
         """
-
+        logging.info(f"Processing message {body}")
         data = json.load(body.decode('utf-8'))
         logging.info(f"Received message : {data}")
         logging.debug("Downloading image.")
@@ -140,13 +140,15 @@ class Consumer(object):
             send_json(payload=ner_results, job_id=data['job_id'], file_id=data['file_id'])
 
 
+
 if __name__ == '__main__':
-    logging.basicConfig(filemode='a', filename="./logs/queue_tasks.log",
+    logging.basicConfig(filemode='a', filename=f"{LOG_DIRECTORY}queue_tasks.log",
                         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
     credentials = PlainCredentials(RABBITMQ_LOGIN, RABBITMQ_PASSWORD)
     connection_parameters = ConnectionParameters(host=RABBITMQ_SERVER, port=RABBITMQ_PORT, virtual_host="/",
                                                  credentials=credentials)
+
     with Consumer(parameters=connection_parameters, nlp_model_path=INVOICE_NER_MODEL, ocr_model_path=INVOICE_EAST_MODEL,
-                  queue=RABBITMQ_EXCHANGE_NAME) as consumer:
+                  queue=RABBITMQ_QUEUE_NAME) as consumer:
         consumer.start()

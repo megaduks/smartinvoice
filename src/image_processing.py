@@ -3,6 +3,7 @@ import numpy as np
 import pytesseract
 import argparse
 import os
+import logging
 
 from scipy.ndimage import interpolation as inter
 from imutils.object_detection import non_max_suppression
@@ -15,6 +16,7 @@ from settings import OCR_PADDING as OCR_PADDING
 from settings import OCR_TESSERACT_CONFIG as CONFIG
 from settings import INVOICE_EAST_MODEL as MODEL_PATH
 
+LOGGER = logging.getLogger(__name__)
 
 class Graph:
     """
@@ -347,6 +349,7 @@ class InvoiceOCR:
         self.layer_names = [
             "feature_fusion/Conv_7/Sigmoid",
             "feature_fusion/concat_3"]
+        LOGGER.info("Loading EAST model.")
         self.net = cv2.dnn.readNet(model=model_path)
 
     def process_image(self, image: np.ndarray):

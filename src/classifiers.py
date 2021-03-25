@@ -16,11 +16,6 @@ from utils import clean_ocr
 # import pandas as pd
 
 LOGGER = logging.getLogger(__name__)
-LOGGER.setLevel(logging.INFO)
-
-file_handler = logging.FileHandler(f'{LOG_DIRECTORY}classifier.log')
-file_handler.setFormatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-LOGGER.addHandler(file_handler)
 
 Language.factories['remove_REGON_token'] = remove_REGON_token
 
