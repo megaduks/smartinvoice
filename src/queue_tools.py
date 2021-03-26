@@ -143,7 +143,7 @@ class Consumer(object):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(filemode='a', filename=f"{LOG_DIRECTORY}queue_tasks.log",
+    logging.basicConfig(filemode='a', filename=f"{LOG_DIRECTORY}/queue_tasks.log",
                         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
     credentials = PlainCredentials(RABBITMQ_LOGIN, RABBITMQ_PASSWORD)
