@@ -1,0 +1,141 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "/github.com/megaduks/smartinvoice/invoice.schema.json",
+    "title": "Schemat JSON danych pojawiających się na fakturach",
+    "description": "Schemat opisujący typy atrybutów jakie mogą się pojawić na różnego rodzaju fakturach wystawianych w Polsce. Schemat został stworzony na potrzeby procesu automatycznego rozpoznawania i anotowania cyfrowych faktur.",
+    "version_number": "0.5",
+    "version_date": "2020-07-13",
+    "type": "object",
+    "properties": {
+        "numer_faktury": {
+            "description": "Unikalny numer faktury w ramach faktur wystawionych przez danego sprzedawcę",
+            "type": "string"
+        },
+        "typ_faktury": {
+            "description": "Typ faktury, np. faktura sprzedażowa, faktura pro-forma, zaliczka",
+            "type": "string",
+            "enum": ["faktura_vat","pro_forma","zaliczka","rozliczenie_zaliczki","faktura_rr", "faktura_mp", "faktura_korygujaca" ]
+        },
+        "data_sprzedazy": {
+            "description": "Data faktycznej sprzedaży towaru lub usługi",
+            "type": "string"
+        },
+        "data_wystawienia": {
+            "description": "Data wystawienia faktury za sprzedaż towaru lub usługi",
+            "type": "string"
+        },
+        "nip_sprzedawcy": {
+            "description": "Numer identyfikacji podatkowej sprzedawcy",
+            "type": "string"
+        },
+        "nazwa_sprzedawcy": {
+            "description": "Nazwa przedsiębiorstwa sprzedawcy",
+            "type": "string"
+        },
+        "nip_nabywcy": {
+            "description": "Numer identyfikacji podatkowej nabywcy",
+            "type": "string"
+        },
+        "nazwa_nabywcy": {
+            "description": "Nazwa przedsiębiorstwa nabywcy lub imię i nazwisko osoby fizycznej",
+            "type": "string"
+        },
+        "towary": {
+            "description": "Lista towarów lub usług wymienionych na fakturze",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "lp": { "type": "integer" },
+                    "nazwa": { "type": "string" },
+                    "miara": { "type": "string" },
+                    "ilosc": { "type": "string" },
+                    "cena_jednostkowa": { "type": "number" },
+                    "wartosc_netto": { "type": "number" },
+                    "stawka_podatku": { "type": "number", "enum": [0, 5, 8, 23] },
+                    "kwota_podatku": { "type": "number" },
+                    "wartosc_brutto": { "type": "number" }
+                    }
+                }
+        },
+        "razem_kwota_netto": {
+            "description": "Sumaryczna należność netto za całą fakturę",
+            "type": "string"
+        },
+        "razem_kwota_brutto": {
+            "description": "Sumaryczna należność brutto za całą fakturę",
+            "type": "string"
+        },
+        "razem_kwota_podatku_vat": {
+            "description": "Sumaryczna wartość naliczonego podatku VAT",
+            "type": "string"
+        },
+        "przedplata_kwota_netto": {
+            "description": "Sumaryczna przedpłata netto za całą fakturę",
+            "type": "string"
+        },
+        "przedplata_kwota_brutto": {
+            "description": "Sumaryczna przedpłata brutto za całą fakturę",
+            "type": "string"
+        },
+        "przedplata_kwota_podatku_vat": {
+            "description": "Sumaryczna przedpłata naliczonego podatku VAT",
+            "type": "string"
+        },
+        "rozliczenie_vat": {
+            "description": "Rozbicie kwot netto i brutto na poszczególne stawki podatkowe",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "stawka_podatku": { "type": "string"},
+                    "wartosc_netto": { "type": "string" },
+                    "podatek": { "type": "string" },
+                    "wartosc_brutto": { "type": "string" }
+                }
+            }
+        },
+        "czy_usluga": {
+            "description": "Czy faktura dotyczy wykonanej usługi?",
+            "type": "boolean"
+        },
+        "forma_platnosci": {
+            "description": "Jaka forma płatności jest przewidziana?",
+            "type": "string"
+        },
+        "termin_platnosci": {
+            "description": "Termin płatności w przypadku przelewu",
+            "type": "string"
+        },
+        "numer_konta_sprzedawcy": {
+            "description": "Numer konta do płatności w przypadku przelewu",
+            "type": "string"
+        },
+        "do_zaplaty": {
+            "description": "Sumaryczna kwota jaka pozostała do zapłaty",
+            "type": "string"
+        },
+        "zaplacono": {
+            "description": "Kwota która została zapłacona jako zaliczka",
+            "type": "string"
+        },
+        "zaplacono_w_dniu": {
+            "description": "Data, kiedy nastąpiła płatność faktury",
+            "type": "string"
+        },
+        "razem_do_zwrotu": {
+            "description": "Kwota wynikająca z różnicy między zaliczką/przedpłatą a kwotą na fakturze",
+            "type": "string"
+        },
+        "faktura_zaliczkowa": {
+            "description": "Informacje o fakturze zaliczkowej z którą jest związana dana faktura VAT",
+            "type": "object",
+            "properties": {
+                "data": { "type": "string" },
+                "numer": { "type": "string" },
+                "wartosc": { "type": "string" }
+            }
+        }
+    },
+    "required": [ "numer_faktury", "nip_sprzedawcy", "typ_faktury", "razem_kwota_brutto", "rozliczenie_vat" ]
+}
