@@ -12,6 +12,8 @@ from settings import UPLOAD_URL, ML_SIGNATURE, DOWNLOAD_URL, LOG_DIRECTORY
 from settings import RABBITMQ_PASSWORD, RABBITMQ_LOGIN, RABBITMQ_SERVER, RABBITMQ_QUEUE_NAME, INVOICE_NER_MODEL, \
     INVOICE_EAST_MODEL, RABBITMQ_PORT
 
+LOGGER = logging.getLogger(__name__)
+
 
 def send_json(payload: Dict, job_id: str, file_id: str) -> requests.request:
     """
@@ -33,7 +35,7 @@ def send_json(payload: Dict, job_id: str, file_id: str) -> requests.request:
         response = requests.request(method="POST", url=UPLOAD_URL, json=payload, headers=headers)
         response.raise_for_status()
     except requests.exceptions.HTTPError as err:
-        logging.error("Failed to send.", exc_info=True)
+        LOGGER.error("Failed to send.", exc_info=True)
 
     return response
 
@@ -72,14 +74,14 @@ def get_image_from_token(token: str) -> np.ndarray:
     """
 
     url = DOWNLOAD_URL + token
-    response = requests.get(url, stream=True)
     image = None
 
     try:
+        LOGGER.info("Attempting to download image")
         response = requests.get(url, stream=True)
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        logging.error("Failed to download image", exc_info=True)
+        LOGGER.error("Failed to download image", exc_info=True)
     else:
         image = np.asarray(bytearray(response.raw.read()), dtype="uint8")
         image = cv2.imdecode(image, cv2.IMREAD_COLOR)
@@ -101,7 +103,7 @@ class Consumer(object):
     Class for receiving and processing tasks from queue.
     """
 
-    def __init__(self, parameters: ConnectionParameters, nlp_model_path, ocr_model_path, queue="smart-invoice"):
+    def __init__(self, parameters: ConnectionParameters, nlp_model_path, ocr_model_path, queue):
         self.connection = BlockingConnection(parameters)
         self.channel = self.connection.channel()
         self.queue = queue
@@ -125,16 +127,15 @@ class Consumer(object):
         Processes a RABBITMQ task from queue, passes it through OCR and Ner,
         output is formatted to fit the scheme and sent.
         """
-        logging.info(f"Processing message {body}")
+        LOGGER.info(f"Processing message {body}")
         data = json.load(body.decode('utf-8'))
-        logging.info(f"Received message : {data}")
-        logging.debug("Downloading image.")
+        LOGGER.info(f"Received message : {data}")
         image = get_image_from_token(data["download_token"])
         if image is not None:
             logging.info("[INFO] Processing image")
             _, OCR_text_output = self.ocr.process_image(image)
 
-            logging.info("[INFO] Processing OCR Output")
+            LOGGER.info("[INFO] Processing OCR Output")
             ner_results = self.nlp.predict(OCR_text_output)
 
             send_json(payload=ner_results, job_id=data['job_id'], file_id=data['file_id'])
@@ -151,4 +152,5 @@ if __name__ == '__main__':
 
     with Consumer(parameters=connection_parameters, nlp_model_path=INVOICE_NER_MODEL, ocr_model_path=INVOICE_EAST_MODEL,
                   queue=RABBITMQ_QUEUE_NAME) as consumer:
+        logging.info("Waiting for messages.")
         consumer.start()
