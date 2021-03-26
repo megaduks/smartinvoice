@@ -26,3 +26,4 @@ WORKDIR /smartinvoice
 COPY src /smartinvoice
 # Copying the more sensitive data
 COPY authfile /smartinvoice/.env
+

@@ -153,5 +153,4 @@ if __name__ == '__main__':
     with Consumer(parameters=connection_parameters, nlp_model_path=INVOICE_NER_MODEL, ocr_model_path=INVOICE_EAST_MODEL,
                   queue=RABBITMQ_QUEUE_NAME) as consumer:
         logging.info("Waiting for messages.")
-        print("Consumer starter, waiting for tasks.")
         consumer.start()
