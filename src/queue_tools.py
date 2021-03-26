@@ -143,7 +143,7 @@ class Consumer(object):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(filemode='a', filename=f"{LOG_DIRECTORY}queue_tasks.log",
+    logging.basicConfig(filemode='a', filename=f"{LOG_DIRECTORY}/queue_tasks.log",
                         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
     credentials = PlainCredentials(RABBITMQ_LOGIN, RABBITMQ_PASSWORD)
@@ -153,4 +153,5 @@ if __name__ == '__main__':
     with Consumer(parameters=connection_parameters, nlp_model_path=INVOICE_NER_MODEL, ocr_model_path=INVOICE_EAST_MODEL,
                   queue=RABBITMQ_QUEUE_NAME) as consumer:
         logging.info("Waiting for messages.")
+        print("Consumer starter, waiting for tasks.")
         consumer.start()

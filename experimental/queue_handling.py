@@ -3,7 +3,7 @@ import spacy
 import cv2
 import logging
 
-from settings import RABBITMQ_PASSWORD, RABBITMQ_LOGIN, RABBITMQ_SERVER, RABBITMQ_EXCHANGE_NAME, INVOICE_NER_MODEL, \
+from settings import RABBITMQ_PASSWORD, RABBITMQ_LOGIN, RABBITMQ_SERVER, RABBITMQ_QUEUE_NAME, INVOICE_NER_MODEL, \
     INVOICE_EAST_MODEL, RABBITMQ_PORT, RABBITMQ_VIRTUAL_HOST
 from queue_tools import send_json, get_image_from_token, load_schema
 from image_processing import InvoiceOCR
@@ -14,7 +14,7 @@ from pika import ConnectionParameters, PlainCredentials, BlockingConnection
 
 credentials = PlainCredentials(RABBITMQ_LOGIN, RABBITMQ_PASSWORD)
 connection_parameters = ConnectionParameters(host=RABBITMQ_SERVER, port=RABBITMQ_PORT, virtual_host="/", credentials=credentials)
-exchange_name = RABBITMQ_EXCHANGE_NAME
+exchange_name = RABBITMQ_QUEUE_NAME
 logging.basicConfig(filemode='a', filename="../src/queue_tasks.log", format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 

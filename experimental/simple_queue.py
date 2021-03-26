@@ -1,7 +1,7 @@
 import json
 import cv2
 
-from settings import RABBITMQ_PASSWORD, RABBITMQ_LOGIN, RABBITMQ_SERVER, RABBITMQ_EXCHANGE_NAME
+from settings import RABBITMQ_PASSWORD, RABBITMQ_LOGIN, RABBITMQ_SERVER, RABBITMQ_QUEUE_NAME
 from queue_tools import send_json, get_image_from_token, load_schema
 
 from typing import Dict, List
@@ -9,7 +9,7 @@ from pika import ConnectionParameters, PlainCredentials, BlockingConnection
 
 credentials = PlainCredentials(RABBITMQ_LOGIN, RABBITMQ_PASSWORD)
 connection_parameters = ConnectionParameters(host=RABBITMQ_SERVER, port=5672, virtual_host="/", credentials=credentials)
-exchange_name = RABBITMQ_EXCHANGE_NAME
+exchange_name = RABBITMQ_QUEUE_NAME
 
 
 def processResponse(response, method_frame):
